@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Restore - AI-Powered Photo Restoration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">Photo Restore</h1>
+      <p class="subtitle">Upload an old photo and restore it without changing identity, composition, or style</p>
+    </header>
+
+    <main class="main">
+      <div class="card">
+        <!-- Upload Section -->
+        <div id="uploadSection" class="upload-section">
+          <div
+            id="dropZone"
+            class="drop-zone"
+            role="button"
+            tabindex="0"
+            aria-label="Upload photo area"
+          >
+            <div class="drop-zone-content">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="drop-zone-text">Drag and drop your photo here</p>
+              <p class="drop-zone-subtext">or <span class="browse-link">browse files</span></p>
+              <p class="drop-zone-hint">JPEG, PNG, or WebP up to 10MB</p>
+            </div>
+            <input
+              type="file"
+              id="fileInput"
+              accept="image/jpeg,image/png,image/webp"
+              hidden
+            >
+          </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="previewSection" class="preview-section hidden">
+          <div class="preview-header">
+            <h2 class="preview-title">Your Photo</h2>
+            <div class="preview-actions">
+              <button id="replaceBtn" class="btn btn-secondary">Replace</button>
+              <button id="clearBtn" class="btn btn-ghost">Clear</button>
+            </div>
+          </div>
+          <div class="preview-container">
+            <div class="preview-card">
+              <span class="preview-label">Original</span>
+              <img id="originalPreview" alt="Original photo" class="preview-image">
+            </div>
+            <div id="resultCard" class="preview-card result-card hidden">
+              <span class="preview-label">Restored</span>
+              <img id="resultPreview" alt="Restored photo" class="preview-image">
+            </div>
+          </div>
+        </div>
+
+        <!-- Options Section -->
+        <div id="optionsSection" class="options-section hidden">
+          <div class="input-group">
+            <label for="additionalInstructions" class="input-label">
+              Additional instructions <span class="optional">(optional)</span>
+            </label>
+            <textarea
+              id="additionalInstructions"
+              class="input-textarea"
+              placeholder="e.g., 'slightly reduce grain,' 'restore faded colors gently,' 'focus on face clarity'"
+              rows="2"
+            ></textarea>
+            <p class="input-hint">These will be appended to the base restoration prompt</p>
+          </div>
+
+          <div class="action-buttons">
+            <button id="enhanceBtn" class="btn btn-primary">
+              <span class="btn-text">Enhance</span>
+              <span class="btn-loading hidden">
+                <svg class="spinner" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>
+                  <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+                </svg>
+                Restoring...
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Download Section -->
+        <div id="downloadSection" class="download-section hidden">
+          <button id="downloadBtn" class="btn btn-success">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Download Restored Photo
+          </button>
+          <button id="restoreAgainBtn" class="btn btn-secondary">Restore Again</button>
+        </div>
+
+        <!-- Error Display -->
+        <div id="errorMessage" class="error-message hidden"></div>
+      </div>
+
+      <!-- Info Section -->
+      <div class="info-section">
+        <div class="info-card">
+          <h3 class="info-title">What we restore</h3>
+          <ul class="info-list">
+            <li>Scratches and tears</li>
+            <li>Dust and spots</li>
+            <li>Faded colors</li>
+            <li>Grain and noise</li>
+            <li>Minor exposure issues</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3 class="info-title">What stays the same</h3>
+          <ul class="info-list">
+            <li>Faces and expressions</li>
+            <li>Body proportions</li>
+            <li>Background and setting</li>
+            <li>Composition and framing</li>
+            <li>Original aesthetic</li>
+          </ul>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <p class="privacy-note">
+          Your photos are processed securely and not stored on our servers.
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

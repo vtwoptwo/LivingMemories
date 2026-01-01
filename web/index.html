@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Enhancer</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Photo Enhancer</h1>
+      <p class="subtitle">Restore your old photos with AI-powered enhancement</p>
+    </header>
+
+    <main>
+      <div class="upload-section">
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-content">
+            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p class="dropzone-text">Drag & drop your photo here</p>
+            <p class="dropzone-hint">or click to browse</p>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+
+        <div class="preview-container" id="previewContainer" hidden>
+          <img id="previewImage" alt="Preview">
+          <button class="remove-btn" id="removeBtn" title="Remove image">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="options-section">
+        <label for="userPrompt" class="options-label">Additional Instructions (optional)</label>
+        <textarea
+          id="userPrompt"
+          class="options-textarea"
+          placeholder="e.g., Also colorize the photo, enhance the contrast..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <button class="enhance-btn" id="enhanceBtn" disabled>
+        <span class="btn-text">Enhance Photo</span>
+        <span class="btn-loading" hidden>
+          <svg class="spinner" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"/>
+          </svg>
+          Processing...
+        </span>
+      </button>
+
+      <div class="result-section" id="resultSection" hidden>
+        <h2>Enhanced Result</h2>
+        <div class="result-container">
+          <div class="comparison">
+            <div class="comparison-item">
+              <span class="comparison-label">Original</span>
+              <img id="originalThumb" alt="Original">
+            </div>
+            <div class="comparison-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+            <div class="comparison-item">
+              <span class="comparison-label">Enhanced</span>
+              <img id="resultImage" alt="Enhanced">
+            </div>
+          </div>
+          <a class="download-btn" id="downloadBtn" download="enhanced-photo.png">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download Enhanced Photo
+          </a>
+        </div>
+      </div>
+
+      <div class="error-section" id="errorSection" hidden>
+        <p id="errorMessage"></p>
+      </div>
+    </main>
+
+    <footer>
+      <p>Powered by Gemini AI</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
