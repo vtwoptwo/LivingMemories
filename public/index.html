@@ -8,8 +8,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-content">
+      <a href="/" class="nav-brand">Photo Restore</a>
+      <div class="nav-links">
+        <a href="/" class="nav-link active">New Restore</a>
+        <a href="/library.html" class="nav-link">Library</a>
+      </div>
+      <div id="userMenu" class="nav-user hidden">
+        <span id="userEmail" class="nav-email"></span>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
   <div class="container">
     <header class="header">
       <h1 class="title">Photo Restore</h1>
@@ -69,7 +85,7 @@
         <div id="optionsSection" class="options-section hidden">
           <div class="input-group">
             <label for="additionalInstructions" class="input-label">
-              Additional instructions <span class="optional">(optional)</span>
+              Restoration instructions <span class="optional">(optional)</span>
             </label>
             <textarea
               id="additionalInstructions"
@@ -77,7 +93,7 @@
               placeholder="e.g., 'slightly reduce grain,' 'restore faded colors gently,' 'focus on face clarity'"
               rows="2"
             ></textarea>
-            <p class="input-hint">These will be appended to the base restoration prompt</p>
+            <p class="input-hint">These will guide the AI restoration process</p>
           </div>
 
           <div class="action-buttons">
@@ -94,15 +110,94 @@
           </div>
         </div>
 
-        <!-- Download Section -->
+        <!-- Download Section (shown after enhancement) -->
         <div id="downloadSection" class="download-section hidden">
-          <button id="downloadBtn" class="btn btn-success">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-            </svg>
-            Download Restored Photo
-          </button>
-          <button id="restoreAgainBtn" class="btn btn-secondary">Restore Again</button>
+          <div class="result-actions">
+            <button id="downloadBtn" class="btn btn-success">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+              Download
+            </button>
+            <button id="restoreAgainBtn" class="btn btn-secondary">Restore Again</button>
+          </div>
+
+          <!-- Save to Library Section -->
+          <div id="saveToLibrarySection" class="save-library-section">
+            <div class="save-library-header">
+              <h3 class="save-library-title">Save to Library</h3>
+              <p class="save-library-subtitle">Keep this restoration in your library for future access</p>
+            </div>
+
+            <div class="save-library-form">
+              <div class="form-row">
+                <div class="input-group flex-1">
+                  <label for="photoTitle" class="input-label">Title</label>
+                  <input
+                    type="text"
+                    id="photoTitle"
+                    class="input-field"
+                    placeholder="e.g., 'Grandma's Wedding 1962'"
+                  >
+                </div>
+                <div class="input-group">
+                  <label for="photoDate" class="input-label">Photo Date</label>
+                  <input
+                    type="date"
+                    id="photoDate"
+                    class="input-field"
+                  >
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="input-group flex-1">
+                  <label for="photoFolder" class="input-label">Folder</label>
+                  <select id="photoFolder" class="input-field">
+                    <option value="">No folder</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="photoNotes" class="input-label">Notes</label>
+                <textarea
+                  id="photoNotes"
+                  class="input-textarea"
+                  placeholder="Add any notes about this photo..."
+                  rows="2"
+                ></textarea>
+              </div>
+
+              <button id="saveToLibraryBtn" class="btn btn-primary btn-save-library">
+                <span class="btn-text">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                    <polyline points="17,21 17,13 7,13 7,21"/>
+                    <polyline points="7,3 7,8 15,8"/>
+                  </svg>
+                  Save to Library
+                </span>
+                <span class="btn-loading hidden">
+                  <svg class="spinner" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>
+                    <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+                  </svg>
+                  Saving...
+                </span>
+              </button>
+
+              <!-- Saved confirmation (shown after saving) -->
+              <div id="savedConfirmation" class="saved-confirmation hidden">
+                <svg class="saved-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>Saved to library!</span>
+                <a href="/library.html" class="view-library-link">View in Library</a>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Error Display -->
@@ -141,6 +236,38 @@
     </main>
   </div>
 
+  <script src="auth.js"></script>
   <script src="app.js"></script>
+  <script>
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAuthenticated = await Auth.requireAuth('/login.html');
+      if (isAuthenticated) {
+        const user = await Auth.getCurrentUser();
+        if (user) {
+          document.getElementById('userEmail').textContent = user.email;
+          document.getElementById('userMenu').classList.remove('hidden');
+        }
+
+        // Setup logout button
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+          try {
+            await Auth.signOut();
+            window.location.href = '/login.html';
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
+        });
+
+        // Check for photoId in URL (for enhance again from library)
+        const urlParams = new URLSearchParams(window.location.search);
+        const photoId = urlParams.get('photoId');
+        if (photoId) {
+          console.log('Enhance photo:', photoId);
+          // Could pre-load the photo here if needed
+        }
+      }
+    });
+  </script>
 </body>
 </html>

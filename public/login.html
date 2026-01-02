@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Photo Restore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="container auth-container">
+    <header class="header">
+      <h1 class="title">Photo Restore</h1>
+      <p class="subtitle">Sign in to restore your photos</p>
+    </header>
+
+    <main class="main">
+      <div class="card auth-card">
+        <h2 class="auth-title">Welcome back</h2>
+
+        <form id="loginForm" class="auth-form">
+          <div class="input-group">
+            <label for="email" class="input-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="input-field"
+              placeholder="you@example.com"
+              required
+              autocomplete="email"
+            >
+          </div>
+
+          <div class="input-group">
+            <label for="password" class="input-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="input-field"
+              placeholder="Your password"
+              required
+              autocomplete="current-password"
+              minlength="6"
+            >
+          </div>
+
+          <div id="errorMessage" class="error-message hidden"></div>
+          <div id="successMessage" class="success-message hidden"></div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary btn-full">
+            <span class="btn-text">Sign In</span>
+            <span class="btn-loading hidden">
+              <svg class="spinner" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>
+                <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+              </svg>
+              Signing in...
+            </span>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Don't have an account? <a href="/signup.html" class="auth-link">Sign up</a></p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Supabase config will be injected by server
+  </script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check if already authenticated
+      await Auth.redirectIfAuthenticated('/');
+
+      const form = document.getElementById('loginForm');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const submitBtn = document.getElementById('submitBtn');
+      const errorMessage = document.getElementById('errorMessage');
+      const successMessage = document.getElementById('successMessage');
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+        successMessage.classList.add('hidden');
+      }
+
+      function showSuccess(message) {
+        successMessage.textContent = message;
+        successMessage.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
+      }
+
+      function hideMessages() {
+        errorMessage.classList.add('hidden');
+        successMessage.classList.add('hidden');
+      }
+
+      function setLoading(loading) {
+        submitBtn.disabled = loading;
+        submitBtn.querySelector('.btn-text').classList.toggle('hidden', loading);
+        submitBtn.querySelector('.btn-loading').classList.toggle('hidden', !loading);
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideMessages();
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+          showError('Please fill in all fields');
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          await Auth.signIn(email, password);
+          showSuccess('Login successful! Redirecting...');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1000);
+        } catch (error) {
+          console.error('Login error:', error);
+          showError(error.message || 'Failed to sign in. Please try again.');
+        } finally {
+          setLoading(false);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

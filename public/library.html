@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Library - Photo Restore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="library.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-content">
+      <a href="/" class="nav-brand">Photo Restore</a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">New Restore</a>
+        <a href="/library.html" class="nav-link active">Library</a>
+      </div>
+      <div id="userMenu" class="nav-user hidden">
+        <span id="userEmail" class="nav-email"></span>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="library-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Library</h3>
+        <ul class="sidebar-nav">
+          <li>
+            <button class="sidebar-btn active" data-view="all">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+              All Photos
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-btn" data-view="favorites">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Favorites
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-btn" data-view="recent">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              Recent
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-header">
+          <h3 class="sidebar-title">Folders</h3>
+          <button id="newFolderBtn" class="btn-icon-sm" title="New Folder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+        <ul id="folderList" class="sidebar-nav folder-list">
+          <!-- Folders loaded dynamically -->
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">History</h3>
+        <ul class="sidebar-nav">
+          <li>
+            <button class="sidebar-btn" data-view="jobs">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+              Enhancement Jobs
+            </button>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="library-main">
+      <header class="library-header">
+        <h1 id="viewTitle" class="library-title">All Photos</h1>
+        <div class="library-actions">
+          <div class="view-toggle">
+            <button id="gridViewBtn" class="btn-icon active" title="Grid View">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+              </svg>
+            </button>
+            <button id="listViewBtn" class="btn-icon" title="List View">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"/>
+                <line x1="8" y1="12" x2="21" y2="12"/>
+                <line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                <line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Photo Grid -->
+      <div id="photoGrid" class="photo-grid">
+        <!-- Photos loaded dynamically -->
+      </div>
+
+      <!-- Jobs View (hidden by default) -->
+      <div id="jobsView" class="jobs-view hidden">
+        <div id="jobsList" class="jobs-list">
+          <!-- Jobs loaded dynamically -->
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state hidden">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        <h3 class="empty-title">No photos yet</h3>
+        <p class="empty-text">Upload your first photo to get started</p>
+        <a href="/" class="btn btn-primary">Upload Photo</a>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-state">
+        <svg class="spinner-lg" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>
+          <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </svg>
+        <p>Loading...</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Photo Detail Modal -->
+  <div id="photoModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content photo-detail">
+      <button class="modal-close">&times;</button>
+      <div class="photo-detail-grid">
+        <div class="comparison-container">
+          <!-- View Toggle -->
+          <div class="comparison-toggle">
+            <button class="comparison-toggle-btn active" data-view="side-by-side">Side by Side</button>
+            <button class="comparison-toggle-btn" data-view="original">Original Only</button>
+            <button class="comparison-toggle-btn" data-view="enhanced">Enhanced Only</button>
+          </div>
+
+          <!-- Comparison View -->
+          <div id="comparisonView" class="comparison-view">
+            <!-- Original Panel -->
+            <div id="originalPanel" class="comparison-panel">
+              <div class="comparison-header">
+                <span class="comparison-label">Original</span>
+                <div class="comparison-actions">
+                  <button class="comparison-action-btn" title="Download Original" data-action="download" data-version="original">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                  </button>
+                  <button class="comparison-action-btn" title="Copy Original" data-action="copy" data-version="original">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="comparison-image-container">
+                <img id="originalImage" src="" alt="Original" class="comparison-image">
+              </div>
+            </div>
+
+            <!-- Enhanced Panel -->
+            <div id="enhancedPanel" class="comparison-panel">
+              <div class="comparison-header">
+                <span class="comparison-label">Enhanced</span>
+                <div class="comparison-actions">
+                  <button class="comparison-action-btn" title="Download Enhanced" data-action="download" data-version="enhanced">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                  </button>
+                  <button class="comparison-action-btn" title="Copy Enhanced" data-action="copy" data-version="enhanced">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="comparison-image-container">
+                <img id="enhancedImage" src="" alt="Enhanced" class="comparison-image">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="photo-info">
+          <h2 id="photoTitle" class="photo-info-title"></h2>
+          <div class="photo-meta">
+            <p><strong>Created:</strong> <span id="photoCreated"></span></p>
+            <p><strong>Versions:</strong> <span id="photoVersionCount"></span></p>
+          </div>
+          <div class="photo-actions-detail">
+            <button id="enhanceAgainBtn" class="btn btn-primary">Enhance Again</button>
+            <button id="favoriteBtn" class="btn btn-secondary">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Favorite
+            </button>
+            <button id="deletePhotoBtn" class="btn btn-ghost text-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Folder Modal -->
+  <div id="folderModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content modal-sm">
+      <h3 class="modal-title">New Folder</h3>
+      <form id="folderForm">
+        <div class="input-group">
+          <label for="folderName" class="input-label">Folder Name</label>
+          <input type="text" id="folderName" class="input-field" placeholder="My Folder" required>
+        </div>
+        <div class="input-group">
+          <label for="parentFolder" class="input-label">Parent Folder <span class="optional">(optional)</span></label>
+          <select id="parentFolder" class="input-field">
+            <option value="">None (root level)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="library.js"></script>
+</body>
+</html>
