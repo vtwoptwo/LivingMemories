@@ -1,3 +1,9 @@
+/* ============================================
+   VINTAGE PHOTO ALBUM AESTHETIC
+   Inspired by antique leather-bound albums,
+   Victorian photography, and old family archives
+   ============================================ */
+
 /* Base Reset & Variables */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -6,23 +12,46 @@
 }
 
 :root {
-  /* Colors */
-  --color-bg: #f8f9fa;
-  --color-surface: #ffffff;
-  --color-text: #1a1a2e;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
-  --color-border: #e5e7eb;
-  --color-border-light: #f3f4f6;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-light: #eff6ff;
-  --color-success: #059669;
-  --color-success-hover: #047857;
-  --color-error: #dc2626;
-  --color-error-bg: #fef2f2;
+  /* Antique Color Palette */
+  --color-bg: #e8dfd0;
+  --color-bg-warm: #ddd2c0;
+  --color-bg-dark: #c4b49a;
+  --color-surface: #f7f3eb;
+  --color-surface-aged: #efe9dc;
+  --color-cream: #fdfbf5;
+  --color-ivory: #fffef8;
+  --color-parchment: #f5eedf;
 
-  /* Spacing (8px grid) */
+  /* Rich Browns & Sepia */
+  --color-text: #2c1810;
+  --color-text-secondary: #5c4434;
+  --color-text-muted: #8b7355;
+  --color-sepia: #704214;
+  --color-sepia-dark: #4a2c0f;
+  --color-mahogany: #4a0e0e;
+  --color-leather: #654321;
+  --color-leather-dark: #3d2914;
+
+  /* Borders & Accents */
+  --color-border: #c9b896;
+  --color-border-light: #ddd4c0;
+  --color-border-dark: #a08060;
+  --color-gold: #b8860b;
+  --color-gold-light: #daa520;
+  --color-brass: #c9a227;
+  --color-copper: #b87333;
+
+  /* Functional Colors */
+  --color-primary: #6b3a1f;
+  --color-primary-hover: #4d2a16;
+  --color-primary-light: #f5ebe0;
+  --color-success: #4a5d4a;
+  --color-success-hover: #3a4a3a;
+  --color-success-bg: #e8f0e8;
+  --color-error: #8b3a3a;
+  --color-error-bg: #f5e5e5;
+
+  /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -34,29 +63,41 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Typography - Elegant Vintage */
+  --font-display: 'Playfair Display', 'Didot', 'Georgia', serif;
+  --font-body: 'Crimson Text', 'Garamond', 'Times New Roman', serif;
+  --font-ui: 'Source Sans 3', 'Helvetica Neue', sans-serif;
+  --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 2rem;
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.625;
+  --font-size-4xl: 2.75rem;
+  --font-size-5xl: 3.5rem;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
 
   /* Effects */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --radius-sm: 6px;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --transition: 150ms ease;
-  --transition-slow: 300ms ease;
+  --shadow-sm: 0 1px 3px rgba(44, 24, 16, 0.1);
+  --shadow: 0 3px 10px rgba(44, 24, 16, 0.15);
+  --shadow-md: 0 6px 20px rgba(44, 24, 16, 0.18);
+  --shadow-lg: 0 12px 40px rgba(44, 24, 16, 0.22);
+  --shadow-vintage:
+    0 4px 20px rgba(44, 24, 16, 0.2),
+    0 0 0 1px rgba(44, 24, 16, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --shadow-emboss:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  --radius-sm: 3px;
+  --radius: 5px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --transition: 200ms ease;
+  --transition-slow: 400ms ease;
 }
 
 html {
@@ -65,13 +106,71 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Aged Paper Background */
 body {
-  font-family: var(--font-family);
+  font-family: var(--font-body);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   color: var(--color-text);
-  background-color: var(--color-bg);
+  background:
+    /* Subtle grain texture */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
+    /* Aged paper staining */
+    radial-gradient(ellipse at 20% 80%, rgba(139, 90, 43, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 90, 43, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(139, 90, 43, 0.04) 0%, transparent 70%),
+    /* Base color */
+    linear-gradient(to bottom, var(--color-bg) 0%, var(--color-bg-warm) 100%);
+  background-blend-mode: soft-light, normal, normal, normal, normal;
   min-height: 100vh;
+}
+
+/* ============================================
+   DECORATIVE ELEMENTS
+   ============================================ */
+
+/* Ornate corner flourish */
+.ornate-corner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.ornate-corner::before,
+.ornate-corner::after {
+  content: '';
+  position: absolute;
+  background: var(--color-sepia);
+}
+
+.ornate-corner.top-left { top: 12px; left: 12px; }
+.ornate-corner.top-right { top: 12px; right: 12px; transform: scaleX(-1); }
+.ornate-corner.bottom-left { bottom: 12px; left: 12px; transform: scaleY(-1); }
+.ornate-corner.bottom-right { bottom: 12px; right: 12px; transform: scale(-1); }
+
+/* Vintage ornamental divider */
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+  color: var(--color-border-dark);
+}
+
+.ornament::before,
+.ornament::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-border), transparent);
+}
+
+.ornament-symbol {
+  font-size: 1.2rem;
+  opacity: 0.6;
 }
 
 /* Container */
@@ -87,109 +186,248 @@ body {
   }
 }
 
-/* Header */
+/* ============================================
+   HEADER - Victorian Style
+   ============================================ */
+
 .header {
   text-align: center;
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-12);
+  padding-bottom: var(--space-8);
+  position: relative;
+}
+
+/* Decorative top border */
+.header::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 3px;
+  background: linear-gradient(to right, transparent, var(--color-gold), var(--color-brass), var(--color-gold), transparent);
+}
+
+/* Decorative bottom with flourish */
+.header::after {
+  content: '❧';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  color: var(--color-sepia);
+  opacity: 0.5;
 }
 
 .title {
-  font-size: var(--font-size-3xl);
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-family: var(--font-display);
+  font-size: var(--font-size-5xl);
+  font-weight: 400;
+  letter-spacing: 0.08em;
   color: var(--color-text);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  text-transform: uppercase;
+  text-shadow:
+    2px 2px 0 rgba(255,255,255,0.5),
+    -1px -1px 0 rgba(0,0,0,0.05);
+  position: relative;
 }
 
 .subtitle {
+  font-family: var(--font-body);
   font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
   max-width: 480px;
   margin: 0 auto;
+  font-style: italic;
+  letter-spacing: 0.02em;
 }
 
-/* Main Card */
+/* ============================================
+   MAIN CARD - Antique Album Page
+   ============================================ */
+
 .card {
   background: var(--color-surface);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-vintage);
+  padding: var(--space-10);
   margin-bottom: var(--space-10);
+  position: relative;
+  border: 1px solid var(--color-border-light);
+  /* Vintage paper effect */
+  background-image:
+    linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 40%),
+    linear-gradient(225deg, rgba(0,0,0,0.02) 0%, transparent 40%);
+}
+
+/* Decorative corner brackets */
+.card::before,
+.card::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-color: var(--color-border-dark);
+  border-style: solid;
+  opacity: 0.4;
+}
+
+.card::before {
+  top: 16px;
+  left: 16px;
+  border-width: 2px 0 0 2px;
+}
+
+.card::after {
+  bottom: 16px;
+  right: 16px;
+  border-width: 0 2px 2px 0;
 }
 
 @media (min-width: 640px) {
   .card {
-    padding: var(--space-10);
+    padding: var(--space-12) var(--space-16);
   }
 }
 
-/* Upload Section */
+/* ============================================
+   UPLOAD SECTION - Vintage Frame
+   ============================================ */
+
 .upload-section {
   width: 100%;
 }
 
 .drop-zone {
-  border: 2px dashed var(--color-border);
+  border: 3px double var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-12) var(--space-6);
+  padding: var(--space-16) var(--space-8);
   text-align: center;
   cursor: pointer;
-  transition: border-color var(--transition), background-color var(--transition);
+  transition: all var(--transition);
+  background:
+    linear-gradient(var(--color-parchment), var(--color-parchment)) padding-box,
+    linear-gradient(135deg, var(--color-gold) 0%, var(--color-brass) 50%, var(--color-gold) 100%) border-box;
+  position: relative;
+  box-shadow:
+    inset 0 2px 10px rgba(0,0,0,0.05),
+    0 4px 15px rgba(44, 24, 16, 0.1);
+}
+
+/* Inner decorative border */
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(139, 90, 43, 0.02) 10px,
+    rgba(139, 90, 43, 0.02) 20px
+  );
+}
+
+/* Corner decorations */
+.drop-zone::after {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, var(--color-gold) 2px, transparent 2px) 0 0,
+    linear-gradient(to right, var(--color-gold) 2px, transparent 2px) 0 100%,
+    linear-gradient(to left, var(--color-gold) 2px, transparent 2px) 100% 0,
+    linear-gradient(to left, var(--color-gold) 2px, transparent 2px) 100% 100%,
+    linear-gradient(to bottom, var(--color-gold) 2px, transparent 2px) 0 0,
+    linear-gradient(to bottom, var(--color-gold) 2px, transparent 2px) 100% 0,
+    linear-gradient(to top, var(--color-gold) 2px, transparent 2px) 0 100%,
+    linear-gradient(to top, var(--color-gold) 2px, transparent 2px) 100% 100%;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  opacity: 0.5;
 }
 
 .drop-zone:hover,
 .drop-zone:focus {
-  border-color: var(--color-primary);
-  background-color: var(--color-primary-light);
+  border-color: var(--color-gold);
+  background:
+    linear-gradient(var(--color-ivory), var(--color-ivory)) padding-box,
+    linear-gradient(135deg, var(--color-gold-light) 0%, var(--color-gold) 50%, var(--color-gold-light) 100%) border-box;
   outline: none;
+  transform: scale(1.005);
+  box-shadow:
+    inset 0 2px 10px rgba(0,0,0,0.05),
+    0 8px 25px rgba(44, 24, 16, 0.15);
 }
 
 .drop-zone.drag-over {
-  border-color: var(--color-primary);
-  background-color: var(--color-primary-light);
-  border-style: solid;
+  border-color: var(--color-gold);
+  transform: scale(1.01);
 }
 
 .drop-zone-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  position: relative;
+  z-index: 1;
 }
 
 .upload-icon {
-  width: 48px;
-  height: 48px;
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-2);
+  width: 64px;
+  height: 64px;
+  color: var(--color-sepia);
+  margin-bottom: var(--space-4);
+  opacity: 0.7;
 }
 
 .drop-zone-text {
-  font-size: var(--font-size-lg);
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
   font-weight: 500;
   color: var(--color-text);
+  letter-spacing: 0.03em;
 }
 
 .drop-zone-subtext {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
 }
 
 .browse-link {
   color: var(--color-primary);
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1px;
+}
+
+.browse-link:hover {
+  color: var(--color-primary-hover);
 }
 
 .drop-zone-hint {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin-top: var(--space-2);
+  font-style: italic;
 }
 
-/* Preview Section */
+/* ============================================
+   PREVIEW SECTION - Album Page Layout
+   ============================================ */
+
 .preview-section {
   animation: fadeIn var(--transition-slow) ease;
 }
@@ -204,8 +442,11 @@ body {
 }
 
 .preview-title {
+  font-family: var(--font-display);
   font-size: var(--font-size-xl);
-  font-weight: 600;
+  font-weight: 500;
+  color: var(--color-text);
+  letter-spacing: 0.03em;
 }
 
 .preview-actions {
@@ -216,7 +457,7 @@ body {
 .preview-container {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-6);
+  gap: var(--space-8);
 }
 
 @media (min-width: 640px) {
@@ -225,61 +466,182 @@ body {
   }
 }
 
+/* Photo Frame - Classic Album Mount */
 .preview-card {
   position: relative;
-  background: var(--color-bg);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  background: var(--color-ivory);
+  border-radius: var(--radius);
+  overflow: visible;
   aspect-ratio: 4/3;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Multi-layer frame effect */
+  box-shadow:
+    /* Inner shadow for depth */
+    inset 0 2px 8px rgba(0,0,0,0.15),
+    inset 0 0 20px rgba(0,0,0,0.05),
+    /* Outer frame shadow */
+    0 4px 20px rgba(44, 24, 16, 0.2),
+    0 8px 40px rgba(44, 24, 16, 0.1);
+  /* Ornate border */
+  border: 12px solid;
+  border-image:
+    linear-gradient(
+      135deg,
+      var(--color-leather) 0%,
+      var(--color-sepia) 25%,
+      var(--color-leather-dark) 50%,
+      var(--color-sepia) 75%,
+      var(--color-leather) 100%
+    ) 1;
+}
+
+/* Photo corners - like real album mounts */
+.preview-card::before,
+.preview-card::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, var(--color-sepia-dark) 0%, var(--color-leather) 100%);
+  z-index: 2;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  opacity: 0.9;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.preview-card::before {
+  top: -2px;
+  left: -2px;
+}
+
+.preview-card::after {
+  bottom: -2px;
+  right: -2px;
+  transform: rotate(180deg);
 }
 
 .preview-label {
   position: absolute;
-  top: var(--space-3);
-  left: var(--space-3);
-  background: var(--color-surface);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius);
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-parchment);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
+  font-style: italic;
   color: var(--color-text-secondary);
   box-shadow: var(--shadow-sm);
   z-index: 1;
+  border: 1px solid var(--color-border-light);
+  letter-spacing: 0.05em;
 }
 
 .preview-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: calc(100% - 16px);
+  max-height: calc(100% - 16px);
   object-fit: contain;
+  filter: contrast(1.02) sepia(0.05);
 }
 
 .result-card {
   position: relative;
 }
 
-.result-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--color-primary-light) 0%, transparent 100%);
-  opacity: 0;
-  transition: opacity var(--transition);
-}
-
 .result-card.loading::before {
-  opacity: 1;
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* Options Section */
+/* Loading Overlay */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 115, 85, 0.95) 0%,
+    rgba(101, 82, 60, 0.95) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: var(--radius-md);
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.loading-content {
+  text-align: center;
+  color: var(--color-cream);
+}
+
+.loading-spinner {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--space-6);
+  color: var(--color-gold);
+}
+
+.loading-spinner svg {
+  width: 100%;
+  height: 100%;
+}
+
+.loading-circle {
+  transform-origin: center;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-stage {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0 0 var(--space-2);
+  color: var(--color-cream);
+}
+
+.loading-hint {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-cream);
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* ============================================
+   OPTIONS SECTION
+   ============================================ */
+
 .options-section {
-  margin-top: var(--space-8);
+  margin-top: var(--space-12);
   padding-top: var(--space-8);
-  border-top: 1px solid var(--color-border-light);
+  border-top: 2px solid var(--color-border-light);
   animation: fadeIn var(--transition-slow) ease;
+  position: relative;
+}
+
+/* Decorative divider element */
+.options-section::before {
+  content: '✦';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  padding: 0 var(--space-4);
+  color: var(--color-gold);
+  font-size: 1.2rem;
 }
 
 .input-group {
@@ -288,51 +650,73 @@ body {
 
 .input-label {
   display: block;
+  font-family: var(--font-ui);
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text);
   margin-bottom: var(--space-2);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .optional {
   color: var(--color-text-muted);
   font-weight: 400;
+  font-style: italic;
+  text-transform: none;
+}
+
+.input-textarea,
+.input-field {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  background: var(--color-ivory);
+  transition: all var(--transition);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .input-textarea {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: inherit;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
   resize: vertical;
-  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
-.input-textarea:focus {
+.input-textarea:focus,
+.input-field:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  border-color: var(--color-gold);
+  box-shadow:
+    inset 0 1px 3px rgba(0,0,0,0.05),
+    0 0 0 3px rgba(184, 134, 11, 0.15);
+  background: var(--color-cream);
 }
 
-.input-textarea::placeholder {
+.input-textarea::placeholder,
+.input-field::placeholder {
   color: var(--color-text-muted);
+  font-style: italic;
 }
 
 .input-hint {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin-top: var(--space-2);
+  font-style: italic;
 }
 
 .action-buttons {
   display: flex;
   justify-content: center;
+  margin-top: var(--space-8);
 }
 
-/* Buttons */
+/* ============================================
+   BUTTONS - Antique Brass Style
+   ============================================ */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -341,67 +725,125 @@ body {
   padding: var(--space-3) var(--space-6);
   border: none;
   border-radius: var(--radius);
-  font-family: inherit;
+  font-family: var(--font-ui);
   font-size: var(--font-size-base);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition);
   text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .btn-primary {
-  background: var(--color-primary);
-  color: white;
-  padding: var(--space-4) var(--space-8);
+  background:
+    linear-gradient(to bottom,
+      var(--color-leather) 0%,
+      var(--color-leather-dark) 50%,
+      var(--color-sepia-dark) 100%
+    );
+  color: var(--color-cream);
+  padding: var(--space-4) var(--space-10);
   font-size: var(--font-size-lg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    inset 0 -2px 0 rgba(0,0,0,0.2),
+    0 4px 0 var(--color-sepia-dark),
+    0 6px 15px rgba(44, 24, 16, 0.3);
+  border: 1px solid var(--color-leather-dark);
+  position: relative;
+}
+
+/* Brass/gold decorative accents */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  background:
+    linear-gradient(to bottom,
+      var(--color-primary) 0%,
+      var(--color-leather) 50%,
+      var(--color-leather-dark) 100%
+    );
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    inset 0 -2px 0 rgba(0,0,0,0.2),
+    0 6px 0 var(--color-sepia-dark),
+    0 10px 25px rgba(44, 24, 16, 0.35);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    inset 0 -2px 0 rgba(0,0,0,0.2),
+    0 2px 0 var(--color-sepia-dark),
+    0 3px 10px rgba(44, 24, 16, 0.3);
 }
 
 .btn-secondary {
-  background: var(--color-bg);
+  background: var(--color-surface);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-sm), var(--shadow-emboss);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--color-border-light);
+  background: var(--color-parchment);
+  border-color: var(--color-border-dark);
+  transform: translateY(-1px);
 }
 
 .btn-ghost {
   background: transparent;
   color: var(--color-text-secondary);
+  border: 1px solid transparent;
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: var(--color-bg);
+  background: var(--color-surface-aged);
   color: var(--color-text);
+  border-color: var(--color-border-light);
 }
 
 .btn-success {
-  background: var(--color-success);
-  color: white;
+  background:
+    linear-gradient(to bottom,
+      var(--color-success) 0%,
+      var(--color-success-hover) 100%
+    );
+  color: var(--color-cream);
   padding: var(--space-4) var(--space-8);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    0 3px 0 #2d3a2d,
+    0 4px 12px rgba(74, 93, 74, 0.3);
+  border: 1px solid var(--color-success-hover);
 }
 
 .btn-success:hover:not(:disabled) {
-  background: var(--color-success-hover);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    0 4px 0 #2d3a2d,
+    0 6px 16px rgba(74, 93, 74, 0.35);
 }
 
 .btn-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .btn-text,
@@ -411,16 +853,40 @@ body {
   gap: var(--space-2);
 }
 
-/* Download Section */
+/* ============================================
+   DOWNLOAD SECTION
+   ============================================ */
+
 .download-section {
-  margin-top: var(--space-8);
+  margin-top: var(--space-10);
   padding-top: var(--space-8);
-  border-top: 1px solid var(--color-border-light);
+  border-top: 2px solid var(--color-border-light);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-4);
   animation: fadeIn var(--transition-slow) ease;
+  position: relative;
+}
+
+.download-section::before {
+  content: '❦';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  padding: 0 var(--space-4);
+  color: var(--color-sepia);
+  font-size: 1.5rem;
+  opacity: 0.6;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
 @media (min-width: 640px) {
@@ -430,19 +896,27 @@ body {
   }
 }
 
-/* Error Message */
+/* ============================================
+   ERROR MESSAGE
+   ============================================ */
+
 .error-message {
   margin-top: var(--space-6);
   padding: var(--space-4);
   background: var(--color-error-bg);
   border-radius: var(--radius);
+  border: 2px solid rgba(139, 58, 58, 0.3);
   color: var(--color-error);
   font-size: var(--font-size-sm);
   text-align: center;
   animation: shake 0.4s ease;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Info Section */
+/* ============================================
+   INFO SECTION - Vintage Cards
+   ============================================ */
+
 .info-section {
   display: grid;
   grid-template-columns: 1fr;
@@ -459,15 +933,51 @@ body {
 .info-card {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  padding: var(--space-8);
   box-shadow: var(--shadow);
+  border: 1px solid var(--color-border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative top ribbon */
+.info-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--color-gold) 0px,
+      var(--color-gold) 10px,
+      var(--color-brass) 10px,
+      var(--color-brass) 20px
+    );
+}
+
+/* Corner flourish */
+.info-card::after {
+  content: '✿';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 1rem;
+  color: var(--color-gold);
+  opacity: 0.4;
 }
 
 .info-title {
-  font-size: var(--font-size-base);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: 500;
   color: var(--color-text);
   margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-light);
+  letter-spacing: 0.02em;
 }
 
 .info-list {
@@ -476,34 +986,56 @@ body {
 
 .info-list li {
   position: relative;
-  padding-left: var(--space-5);
-  margin-bottom: var(--space-2);
-  font-size: var(--font-size-sm);
+  padding-left: var(--space-6);
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
 }
 
 .info-list li::before {
-  content: '';
+  content: '❧';
   position: absolute;
   left: 0;
-  top: 8px;
-  width: 6px;
-  height: 6px;
-  background: var(--color-primary);
-  border-radius: 50%;
+  color: var(--color-sepia);
+  font-size: 0.9em;
+  opacity: 0.7;
 }
 
-/* Footer */
+/* ============================================
+   FOOTER
+   ============================================ */
+
 .footer {
   text-align: center;
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--color-border-light);
+  position: relative;
+}
+
+.footer::before {
+  content: '— ✦ —';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-bg);
+  padding: 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.2em;
 }
 
 .privacy-note {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+  font-style: italic;
 }
 
-/* Utilities */
+/* ============================================
+   UTILITIES
+   ============================================ */
+
 .hidden {
   display: none !important;
 }
@@ -515,11 +1047,14 @@ body {
   animation: spin 1s linear infinite;
 }
 
-/* Animations */
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -528,38 +1063,119 @@ body {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
 
 @keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  20%, 60% {
-    transform: translateX(-4px);
-  }
-  40%, 80% {
-    transform: translateX(4px);
-  }
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
 }
 
-/* Auth Pages */
+/* ============================================
+   NAVIGATION - Vintage Header Bar
+   ============================================ */
+
+.nav {
+  background:
+    linear-gradient(to bottom,
+      var(--color-leather) 0%,
+      var(--color-leather-dark) 100%
+    );
+  border-bottom: 3px solid var(--color-sepia-dark);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow:
+    0 3px 10px rgba(44, 24, 16, 0.2),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.nav-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.nav-brand {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: 400;
+  color: var(--color-cream);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.nav-brand:hover {
+  color: var(--color-gold-light);
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.nav-link {
+  font-family: var(--font-ui);
+  color: rgba(253, 251, 245, 0.8);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  color: var(--color-cream);
+  background: rgba(255,255,255,0.1);
+}
+
+.nav-link.active {
+  color: var(--color-gold-light);
+  background: rgba(0,0,0,0.2);
+  border-color: rgba(218, 165, 32, 0.3);
+  font-weight: 600;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.nav-email {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  color: rgba(253, 251, 245, 0.7);
+}
+
+.btn-sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================
+   AUTH PAGES - Elegant Vintage
+   ============================================ */
+
 .auth-container {
-  max-width: 440px;
+  max-width: 460px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -568,39 +1184,31 @@ body {
 
 .auth-card {
   text-align: center;
+  position: relative;
+}
+
+/* Decorative frame around auth card */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  pointer-events: none;
+  opacity: 0.3;
 }
 
 .auth-title {
-  font-size: var(--font-size-2xl);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: 400;
   color: var(--color-text);
   margin-bottom: var(--space-8);
+  letter-spacing: 0.04em;
 }
 
 .auth-form {
   text-align: left;
-}
-
-.input-field {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: inherit;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  transition: border-color var(--transition), box-shadow var(--transition);
-  background: var(--color-surface);
-}
-
-.input-field:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
-}
-
-.input-field::placeholder {
-  color: var(--color-text-muted);
 }
 
 .btn-full {
@@ -615,193 +1223,61 @@ body {
   text-align: center;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  position: relative;
+}
+
+.auth-footer::before {
+  content: '❧';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  padding: 0 var(--space-3);
+  color: var(--color-sepia);
+  opacity: 0.5;
 }
 
 .auth-link {
   color: var(--color-primary);
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
 }
 
 .auth-link:hover {
   text-decoration: underline;
+  text-decoration-style: wavy;
 }
 
 .success-message {
   margin-top: var(--space-4);
   padding: var(--space-4);
-  background: #ecfdf5;
+  background: var(--color-success-bg);
   border-radius: var(--radius);
+  border: 2px solid rgba(74, 93, 74, 0.3);
   color: var(--color-success);
   font-size: var(--font-size-sm);
   text-align: center;
   animation: fadeIn var(--transition-slow) ease;
 }
 
-/* User Menu */
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  position: absolute;
-  top: var(--space-4);
-  right: var(--space-4);
-}
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
 
-@media (min-width: 640px) {
-  .user-menu {
-    top: var(--space-8);
-    right: var(--space-8);
-  }
-}
-
-.user-email {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .user-email {
-    display: block;
-  }
-}
-
-.btn-logout {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--font-size-sm);
-}
-
-/* Navigation */
-.nav {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.nav-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--space-3) var(--space-6);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-6);
-}
-
-.nav-brand {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.nav-links {
-  display: flex;
-  gap: var(--space-4);
-}
-
-.nav-link {
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  font-weight: 500;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
-  transition: all var(--transition);
-}
-
-.nav-link:hover {
-  color: var(--color-text);
-  background: var(--color-bg);
-}
-
-.nav-link.active {
-  color: var(--color-primary);
-  background: var(--color-primary-light);
-}
-
-.nav-user {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-.nav-email {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-
-.btn-sm {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--font-size-sm);
-}
-
-/* Toggle Switch */
-.save-toggle-section {
-  margin-bottom: var(--space-6);
-  padding-bottom: var(--space-6);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+select.input-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235c4434' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  padding-right: var(--space-10);
   cursor: pointer;
-  user-select: none;
 }
 
-.toggle-label input {
-  display: none;
+input[type="date"].input-field {
+  cursor: pointer;
 }
 
-.toggle-switch {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  background: var(--color-border);
-  border-radius: 12px;
-  transition: background var(--transition);
-}
-
-.toggle-switch::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  transition: transform var(--transition);
-  box-shadow: var(--shadow-sm);
-}
-
-.toggle-label input:checked + .toggle-switch {
-  background: var(--color-primary);
-}
-
-.toggle-label input:checked + .toggle-switch::after {
-  transform: translateX(20px);
-}
-
-.toggle-text {
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-/* Library Options */
-.library-options {
-  animation: fadeIn var(--transition-slow) ease;
-}
-
-.library-options.hidden {
-  display: none;
-}
-
-/* Form Layout */
 .form-row {
   display: flex;
   gap: var(--space-4);
@@ -816,43 +1292,6 @@ body {
   flex: 1;
 }
 
-/* Input Field (reusable) */
-.input-field {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: inherit;
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  transition: border-color var(--transition), box-shadow var(--transition);
-  background: var(--color-surface);
-}
-
-.input-field:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
-}
-
-.input-field::placeholder {
-  color: var(--color-text-muted);
-}
-
-/* Select styling */
-select.input-field {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--space-3) center;
-  padding-right: var(--space-10);
-}
-
-/* Date input styling */
-input[type="date"].input-field {
-  cursor: pointer;
-}
-
 @media (max-width: 640px) {
   .form-row {
     flex-direction: column;
@@ -860,33 +1299,61 @@ input[type="date"].input-field {
   }
 }
 
-/* Save to Library Section */
+/* ============================================
+   SAVE TO LIBRARY SECTION
+   ============================================ */
+
 .save-library-section {
-  margin-top: var(--space-8);
-  padding-top: var(--space-8);
-  border-top: 1px solid var(--color-border-light);
+  margin-top: var(--space-12);
+  padding-top: var(--space-10);
+  border-top: 3px double var(--color-border);
+  position: relative;
+}
+
+/* Decorative header element */
+.save-library-section::before {
+  content: '✤ PRESERVE YOUR MEMORIES ✤';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  padding: 0 var(--space-4);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
+  color: var(--color-sepia);
+  letter-spacing: 0.15em;
+  white-space: nowrap;
 }
 
 .save-library-header {
   text-align: center;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
 .save-library-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: 500;
   color: var(--color-text);
   margin-bottom: var(--space-2);
+  letter-spacing: 0.03em;
 }
 
 .save-library-subtitle {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
+  font-style: italic;
 }
 
 .save-library-form {
   max-width: 500px;
   margin: 0 auto;
+  background: var(--color-parchment);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
 }
 
 .save-library-form .input-group {
@@ -898,13 +1365,6 @@ input[type="date"].input-field {
   margin-top: var(--space-4);
 }
 
-.result-actions {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-}
-
 /* Saved Confirmation */
 .saved-confirmation {
   display: flex;
@@ -912,8 +1372,9 @@ input[type="date"].input-field {
   justify-content: center;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: #ecfdf5;
+  background: var(--color-success-bg);
   border-radius: var(--radius);
+  border: 2px solid rgba(74, 93, 74, 0.3);
   color: var(--color-success);
   margin-top: var(--space-4);
   animation: fadeIn var(--transition-slow) ease;
@@ -927,7 +1388,7 @@ input[type="date"].input-field {
 
 .view-library-link {
   color: var(--color-primary);
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   margin-left: var(--space-2);
 }
@@ -936,14 +1397,40 @@ input[type="date"].input-field {
   text-decoration: underline;
 }
 
-.saved-confirmation.hidden + .btn-save-library,
-.save-library-form:has(.saved-confirmation:not(.hidden)) .btn-save-library {
-  display: none;
-}
-
-/* Hide save form when already saved */
 .save-library-form.saved .input-group,
 .save-library-form.saved .form-row,
 .save-library-form.saved .btn-save-library {
   display: none;
+}
+
+/* ============================================
+   VINTAGE DECORATIVE DIVIDERS
+   ============================================ */
+
+.vintage-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-10) 0;
+}
+
+.vintage-divider::before,
+.vintage-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background:
+    linear-gradient(to right,
+      transparent 0%,
+      var(--color-border) 20%,
+      var(--color-border) 80%,
+      transparent 100%
+    );
+}
+
+.vintage-divider span {
+  color: var(--color-sepia);
+  font-style: italic;
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
 }

@@ -30,6 +30,18 @@ let selectedFile = null;
 let enhancedImageData = null;
 let enhancedMimeType = null;
 let isSavedToLibrary = false;
+let loadingStageInterval = null;
+
+// Loading stage messages
+const loadingStages = [
+  'Analyzing photo...',
+  'Detecting damage...',
+  'Preserving faces...',
+  'Removing scratches...',
+  'Restoring colors...',
+  'Enhancing details...',
+  'Finalizing restoration...'
+];
 
 // Constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -315,6 +327,8 @@ function base64ToBlob(base64, mimeType) {
 function setLoadingState(loading) {
   const btnText = enhanceBtn.querySelector('.btn-text');
   const btnLoading = enhanceBtn.querySelector('.btn-loading');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingStage = document.getElementById('loadingStage');
 
   if (loading) {
     enhanceBtn.disabled = true;
@@ -322,11 +336,31 @@ function setLoadingState(loading) {
     btnLoading.classList.remove('hidden');
     resultCard.classList.add('loading');
     resultCard.classList.remove('hidden');
+
+    // Show loading overlay
+    loadingOverlay.classList.remove('hidden');
+    loadingStage.textContent = loadingStages[0];
+
+    // Cycle through loading stages
+    let stageIndex = 0;
+    loadingStageInterval = setInterval(() => {
+      stageIndex = (stageIndex + 1) % loadingStages.length;
+      loadingStage.textContent = loadingStages[stageIndex];
+    }, 3000);
   } else {
     enhanceBtn.disabled = false;
     btnText.classList.remove('hidden');
     btnLoading.classList.add('hidden');
     resultCard.classList.remove('loading');
+
+    // Hide loading overlay
+    loadingOverlay.classList.add('hidden');
+
+    // Stop cycling stages
+    if (loadingStageInterval) {
+      clearInterval(loadingStageInterval);
+      loadingStageInterval = null;
+    }
   }
 }
 

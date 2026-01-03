@@ -6,7 +6,7 @@
   <title>Photo Restore - AI-Powered Photo Restoration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
@@ -77,6 +77,19 @@
             <div id="resultCard" class="preview-card result-card hidden">
               <span class="preview-label">Restored</span>
               <img id="resultPreview" alt="Restored photo" class="preview-image">
+              <!-- Loading overlay -->
+              <div id="loadingOverlay" class="loading-overlay hidden">
+                <div class="loading-content">
+                  <div class="loading-spinner">
+                    <svg viewBox="0 0 50 50">
+                      <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="3" opacity="0.2"/>
+                      <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="80, 200" class="loading-circle"/>
+                    </svg>
+                  </div>
+                  <p id="loadingStage" class="loading-stage">Analyzing photo...</p>
+                  <p class="loading-hint">This may take 15-30 seconds</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

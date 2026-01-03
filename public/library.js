@@ -3,24 +3,37 @@ let currentView = 'all';
 let currentFolderId = null;
 let photos = [];
 let folders = [];
-let allFolders = []; // Flat list of all folders for dropdowns
+let allFolders = [];
 let jobs = [];
 let currentPhoto = null;
 let currentVersionIndex = 0;
 
-// DOM Elements
-const photoGrid = document.getElementById('photoGrid');
-const jobsView = document.getElementById('jobsView');
-const jobsList = document.getElementById('jobsList');
-const emptyState = document.getElementById('emptyState');
-const loadingState = document.getElementById('loadingState');
-const viewTitle = document.getElementById('viewTitle');
-const folderList = document.getElementById('folderList');
-const photoModal = document.getElementById('photoModal');
-const folderModal = document.getElementById('folderModal');
+// Photo Detail View state
+let originalVersion = null;
+let enhancedVersion = null;
+let currentComparisonView = 'side-by-side';
+
+// Image cache
+const imageCache = new Map();
+
+// DOM Elements (initialized after DOM ready)
+let photoGrid, jobsView, jobsList, emptyState, loadingState, viewTitle;
+let folderList, photoDetailView, folderModal, libraryHeader;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize DOM references
+  photoGrid = document.getElementById('photoGrid');
+  jobsView = document.getElementById('jobsView');
+  jobsList = document.getElementById('jobsList');
+  emptyState = document.getElementById('emptyState');
+  loadingState = document.getElementById('loadingState');
+  viewTitle = document.getElementById('viewTitle');
+  folderList = document.getElementById('folderList');
+  photoDetailView = document.getElementById('photoDetailView');
+  folderModal = document.getElementById('folderModal');
+  libraryHeader = document.querySelector('.library-header');
+
   // Check authentication
   const isAuthenticated = await Auth.requireAuth('/login.html');
   if (!isAuthenticated) return;
@@ -41,8 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Setup sidebar navigation
   setupSidebarNav();
 
-  // Setup modals
+  // Setup modals and inline view
   setupModals();
+  setupPhotoDetailView();
 
   // Setup view toggle
   setupViewToggle();
@@ -51,6 +65,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadFolders();
   await loadPhotos();
 });
+
+// Image caching functions
+async function loadCachedImage(url) {
+  if (!url) return '';
+
+  // Check memory cache first
+  if (imageCache.has(url)) {
+    return imageCache.get(url);
+  }
+
+  // Try to load and cache
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    imageCache.set(url, objectUrl);
+    return objectUrl;
+  } catch (error) {
+    console.error('Image cache error:', error);
+    return url; // Fallback to original URL
+  }
+}
+
+function preloadImages(urls) {
+  urls.forEach(url => {
+    if (url && !imageCache.has(url)) {
+      const img = new Image();
+      img.onload = () => {
+        // Image is now in browser cache
+      };
+      img.src = url;
+    }
+  });
+}
 
 // Sidebar Navigation
 function setupSidebarNav() {
@@ -63,7 +111,6 @@ function setupSidebarNav() {
 
   // New folder button (root level)
   document.getElementById('newFolderBtn').addEventListener('click', () => {
-    // Reset modal for root-level folder creation
     const modalTitle = folderModal.querySelector('.modal-title');
     modalTitle.textContent = 'New Folder';
     document.getElementById('parentFolder').value = '';
@@ -131,6 +178,13 @@ async function loadPhotos() {
     const data = await response.json();
 
     photos = data.photos || [];
+
+    // Preload all thumbnail images
+    const imageUrls = photos.flatMap(photo => {
+      const versions = photo.versions || [];
+      return versions.map(v => v.signedUrl).filter(Boolean);
+    });
+    preloadImages(imageUrls);
 
     hideLoading();
 
@@ -252,13 +306,9 @@ function createJobItem(job) {
 // Load Folders
 async function loadFolders() {
   try {
-    // Fetch all folders (flat list)
     const response = await Auth.authFetch('/api/folders?all=true');
     allFolders = await response.json();
-
-    // Build tree structure for sidebar
     folders = buildFolderTree(allFolders);
-
     renderFolders();
     populateParentFolderDropdown();
   } catch (error) {
@@ -266,17 +316,14 @@ async function loadFolders() {
   }
 }
 
-// Build tree structure from flat list
 function buildFolderTree(flatFolders) {
   const map = {};
   const roots = [];
 
-  // Create a map of id -> folder
   flatFolders.forEach(folder => {
     map[folder.id] = { ...folder, children: [] };
   });
 
-  // Build tree
   flatFolders.forEach(folder => {
     if (folder.parent_id && map[folder.parent_id]) {
       map[folder.parent_id].children.push(map[folder.id]);
@@ -288,14 +335,12 @@ function buildFolderTree(flatFolders) {
   return roots;
 }
 
-// Populate parent folder dropdown in modal
 function populateParentFolderDropdown() {
   const select = document.getElementById('parentFolder');
   if (!select) return;
 
   select.innerHTML = '<option value="">None (root level)</option>';
 
-  // Recursively add folders with indentation
   function addOptions(folders, depth = 0) {
     folders.forEach(folder => {
       const option = document.createElement('option');
@@ -350,19 +395,16 @@ function renderFolderItems(folderTree, container, depth) {
 
     container.appendChild(li);
 
-    // Render children recursively
     if (folder.children && folder.children.length > 0) {
       renderFolderItems(folder.children, container, depth + 1);
     }
   });
 }
 
-// Open create subfolder modal with parent pre-selected
 function openCreateSubfolderModal(parentId, parentName) {
   const parentSelect = document.getElementById('parentFolder');
   parentSelect.value = parentId;
 
-  // Update modal title to show context
   const modalTitle = folderModal.querySelector('.modal-title');
   modalTitle.textContent = `New Subfolder in "${parentName}"`;
 
@@ -370,17 +412,54 @@ function openCreateSubfolderModal(parentId, parentName) {
   document.getElementById('folderName').focus();
 }
 
-// Photo Detail Modal
-let originalVersion = null;
-let enhancedVersion = null;
-let currentComparisonView = 'side-by-side';
+// Setup inline photo detail view
+function setupPhotoDetailView() {
+  // Back button
+  const backBtn = document.getElementById('backToGridBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', closePhotoDetail);
+  }
+
+  // Setup comparison toggle and actions
+  setupComparisonToggle();
+  setupComparisonActions();
+  setupPhotoDetailButtons();
+
+  // Setup editable fields
+  setupEditableFields();
+}
 
 function openPhotoDetail(photo) {
   currentPhoto = photo;
 
-  document.getElementById('photoTitle').textContent = photo.title || 'Untitled';
+  // Set read-only meta
   document.getElementById('photoCreated').textContent = formatDate(photo.created_at);
   document.getElementById('photoVersionCount').textContent = photo.versions?.length || 0;
+
+  // Populate editable fields
+  const titleInput = document.getElementById('editPhotoTitle');
+  const dateInput = document.getElementById('editPhotoDate');
+  const folderSelect = document.getElementById('editPhotoFolder');
+  const notesInput = document.getElementById('editPhotoNotes');
+
+  titleInput.value = photo.title || '';
+  dateInput.value = photo.assigned_date || photo.photo_date || '';
+  notesInput.value = photo.description || photo.notes || '';
+
+  // Populate folder dropdown
+  populateDetailFolderDropdown(photo.folder_id);
+
+  // Store original values for change detection
+  titleInput.dataset.original = titleInput.value;
+  dateInput.dataset.original = dateInput.value;
+  folderSelect.dataset.original = photo.folder_id || '';
+  notesInput.dataset.original = notesInput.value;
+
+  // Reset save button state
+  const saveBtn = document.getElementById('savePhotoBtn');
+  const saveStatus = document.getElementById('saveStatus');
+  if (saveBtn) saveBtn.disabled = true;
+  if (saveStatus) saveStatus.classList.add('hidden');
 
   // Find original and enhanced versions
   const versions = photo.versions || [];
@@ -409,12 +488,27 @@ function openPhotoDetail(photo) {
   // Update favorite button
   updateFavoriteButton(photo.favorite);
 
-  // Setup modal buttons
-  setupPhotoDetailButtons();
-  setupComparisonToggle();
-  setupComparisonActions();
+  // Hide grid/jobs views and header, show detail view
+  photoGrid.classList.add('hidden');
+  jobsView.classList.add('hidden');
+  emptyState.classList.add('hidden');
+  libraryHeader.classList.add('hidden');
+  photoDetailView.classList.remove('hidden');
+}
 
-  photoModal.classList.remove('hidden');
+function closePhotoDetail() {
+  photoDetailView.classList.add('hidden');
+  libraryHeader.classList.remove('hidden');
+
+  // Re-render the grid to reflect any changes made
+  if (currentView === 'jobs') {
+    jobsView.classList.remove('hidden');
+  } else if (photos.length === 0) {
+    emptyState.classList.remove('hidden');
+  } else {
+    renderPhotos(); // Re-render to update titles, etc.
+    photoGrid.classList.remove('hidden');
+  }
 }
 
 function setComparisonView(view) {
@@ -485,7 +579,6 @@ async function copyVersionToClipboard(version, versionType) {
     showToast(`${versionType === 'original' ? 'Original' : 'Enhanced'} copied to clipboard`);
   } catch (error) {
     console.error('Copy error:', error);
-    // Fallback: copy URL
     try {
       await navigator.clipboard.writeText(version.signedUrl);
       showToast('Image URL copied to clipboard');
@@ -496,7 +589,6 @@ async function copyVersionToClipboard(version, versionType) {
 }
 
 function showToast(message) {
-  // Simple toast notification
   const existing = document.querySelector('.toast');
   if (existing) existing.remove();
 
@@ -508,12 +600,13 @@ function showToast(message) {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #333;
-    color: white;
+    background: var(--color-leather, #654321);
+    color: var(--color-cream, #fdfbf5);
     padding: 12px 24px;
     border-radius: 8px;
     font-size: 14px;
     z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     animation: fadeIn 0.3s ease;
   `;
   document.body.appendChild(toast);
@@ -523,54 +616,63 @@ function showToast(message) {
 
 function setupPhotoDetailButtons() {
   // Enhance again
-  document.getElementById('enhanceAgainBtn').onclick = async () => {
-    if (!currentPhoto) return;
-    photoModal.classList.add('hidden');
-    window.location.href = `/?photoId=${currentPhoto.id}`;
-  };
+  const enhanceBtn = document.getElementById('enhanceAgainBtn');
+  if (enhanceBtn) {
+    enhanceBtn.onclick = () => {
+      if (!currentPhoto) return;
+      window.location.href = `/?photoId=${currentPhoto.id}`;
+    };
+  }
 
   // Favorite
-  document.getElementById('favoriteBtn').onclick = async () => {
-    if (!currentPhoto) return;
-    try {
-      const newFavorite = !currentPhoto.favorite;
-      await Auth.authFetch(`/api/photos/${currentPhoto.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ favorite: newFavorite }),
-      });
-      currentPhoto.favorite = newFavorite;
-      updateFavoriteButton(newFavorite);
+  const favoriteBtn = document.getElementById('favoriteBtn');
+  if (favoriteBtn) {
+    favoriteBtn.onclick = async () => {
+      if (!currentPhoto) return;
+      try {
+        const newFavorite = !currentPhoto.favorite;
+        await Auth.authFetch(`/api/photos/${currentPhoto.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ favorite: newFavorite }),
+        });
+        currentPhoto.favorite = newFavorite;
+        updateFavoriteButton(newFavorite);
 
-      // Update in list
-      const photoIndex = photos.findIndex(p => p.id === currentPhoto.id);
-      if (photoIndex >= 0) {
-        photos[photoIndex].favorite = newFavorite;
+        const photoIndex = photos.findIndex(p => p.id === currentPhoto.id);
+        if (photoIndex >= 0) {
+          photos[photoIndex].favorite = newFavorite;
+        }
+      } catch (error) {
+        console.error('Favorite error:', error);
       }
-    } catch (error) {
-      console.error('Favorite error:', error);
-    }
-  };
+    };
+  }
 
   // Delete
-  document.getElementById('deletePhotoBtn').onclick = async () => {
-    if (!currentPhoto) return;
-    if (!confirm('Are you sure you want to delete this photo?')) return;
+  const deleteBtn = document.getElementById('deletePhotoBtn');
+  if (deleteBtn) {
+    deleteBtn.onclick = async () => {
+      if (!currentPhoto) return;
+      if (!confirm('Are you sure you want to delete this photo?')) return;
 
-    try {
-      await Auth.authFetch(`/api/photos/${currentPhoto.id}`, {
-        method: 'DELETE',
-      });
-      photoModal.classList.add('hidden');
-      loadPhotos();
-    } catch (error) {
-      console.error('Delete error:', error);
-    }
-  };
+      try {
+        await Auth.authFetch(`/api/photos/${currentPhoto.id}`, {
+          method: 'DELETE',
+        });
+        closePhotoDetail();
+        loadPhotos(); // Reload to update the list
+      } catch (error) {
+        console.error('Delete error:', error);
+      }
+    };
+  }
 }
 
 function updateFavoriteButton(isFavorite) {
   const btn = document.getElementById('favoriteBtn');
+  if (!btn) return;
+
   btn.innerHTML = `
     <svg class="btn-icon" viewBox="0 0 24 24" fill="${isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -596,67 +698,79 @@ function setupModals() {
   });
 
   // Folder form
-  document.getElementById('folderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('folderName').value.trim();
-    const parentId = document.getElementById('parentFolder').value;
-    if (!name) return;
+  const folderForm = document.getElementById('folderForm');
+  if (folderForm) {
+    folderForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('folderName').value.trim();
+      const parentId = document.getElementById('parentFolder').value;
+      if (!name) return;
 
-    try {
-      const body = { name };
-      if (parentId) {
-        body.parentId = parseInt(parentId);
+      try {
+        const body = { name };
+        if (parentId) {
+          body.parentId = parseInt(parentId);
+        }
+
+        await Auth.authFetch('/api/folders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        document.getElementById('folderName').value = '';
+        document.getElementById('parentFolder').value = '';
+        folderModal.classList.add('hidden');
+        await loadFolders();
+      } catch (error) {
+        console.error('Create folder error:', error);
       }
-
-      await Auth.authFetch('/api/folders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      document.getElementById('folderName').value = '';
-      document.getElementById('parentFolder').value = '';
-      folderModal.classList.add('hidden');
-      await loadFolders();
-    } catch (error) {
-      console.error('Create folder error:', error);
-    }
-  });
+    });
+  }
 }
 
 // View Toggle
 function setupViewToggle() {
-  document.getElementById('gridViewBtn').addEventListener('click', () => {
-    document.getElementById('gridViewBtn').classList.add('active');
-    document.getElementById('listViewBtn').classList.remove('active');
-    photoGrid.style.display = 'grid';
-  });
+  const gridBtn = document.getElementById('gridViewBtn');
+  const listBtn = document.getElementById('listViewBtn');
 
-  document.getElementById('listViewBtn').addEventListener('click', () => {
-    document.getElementById('listViewBtn').classList.add('active');
-    document.getElementById('gridViewBtn').classList.remove('active');
-    photoGrid.style.display = 'flex';
-    photoGrid.style.flexDirection = 'column';
-  });
+  if (gridBtn) {
+    gridBtn.addEventListener('click', () => {
+      gridBtn.classList.add('active');
+      listBtn?.classList.remove('active');
+      photoGrid.style.display = 'grid';
+    });
+  }
+
+  if (listBtn) {
+    listBtn.addEventListener('click', () => {
+      listBtn.classList.add('active');
+      gridBtn?.classList.remove('active');
+      photoGrid.style.display = 'flex';
+      photoGrid.style.flexDirection = 'column';
+    });
+  }
 }
 
 // Utility functions
 function showLoading() {
-  loadingState.classList.remove('hidden');
+  loadingState?.classList.remove('hidden');
 }
 
 function hideLoading() {
-  loadingState.classList.add('hidden');
+  loadingState?.classList.add('hidden');
 }
 
 function showEmpty() {
-  emptyState.classList.remove('hidden');
+  emptyState?.classList.remove('hidden');
 }
 
 function hideContent() {
-  photoGrid.classList.add('hidden');
-  jobsView.classList.add('hidden');
-  emptyState.classList.add('hidden');
+  photoGrid?.classList.add('hidden');
+  jobsView?.classList.add('hidden');
+  emptyState?.classList.add('hidden');
+  photoDetailView?.classList.add('hidden');
+  libraryHeader?.classList.remove('hidden');
 }
 
 function formatDate(dateString) {
@@ -667,4 +781,162 @@ function formatDate(dateString) {
     month: 'short',
     day: 'numeric',
   });
+}
+
+// ============================================
+// EDITABLE FIELDS & SAVE FUNCTIONALITY
+// ============================================
+
+function setupEditableFields() {
+  const titleInput = document.getElementById('editPhotoTitle');
+  const dateInput = document.getElementById('editPhotoDate');
+  const folderSelect = document.getElementById('editPhotoFolder');
+  const notesInput = document.getElementById('editPhotoNotes');
+  const saveBtn = document.getElementById('savePhotoBtn');
+
+  // Add change listeners to all editable fields
+  [titleInput, dateInput, folderSelect, notesInput].forEach(field => {
+    if (field) {
+      field.addEventListener('input', checkForChanges);
+      field.addEventListener('change', checkForChanges);
+    }
+  });
+
+  // Save button click handler
+  if (saveBtn) {
+    saveBtn.addEventListener('click', savePhotoChanges);
+  }
+}
+
+function populateDetailFolderDropdown(selectedFolderId) {
+  const select = document.getElementById('editPhotoFolder');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">No folder</option>';
+
+  // Use the allFolders array that was loaded
+  const folderTree = buildFolderTree(allFolders);
+
+  function addOptions(folders, depth = 0) {
+    folders.forEach(folder => {
+      const option = document.createElement('option');
+      option.value = folder.id;
+      option.textContent = '  '.repeat(depth) + (depth > 0 ? '└ ' : '') + folder.name;
+      if (folder.id === selectedFolderId) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+
+      if (folder.children && folder.children.length > 0) {
+        addOptions(folder.children, depth + 1);
+      }
+    });
+  }
+
+  addOptions(folderTree);
+}
+
+function checkForChanges() {
+  const titleInput = document.getElementById('editPhotoTitle');
+  const dateInput = document.getElementById('editPhotoDate');
+  const folderSelect = document.getElementById('editPhotoFolder');
+  const notesInput = document.getElementById('editPhotoNotes');
+  const saveBtn = document.getElementById('savePhotoBtn');
+  const saveStatus = document.getElementById('saveStatus');
+
+  if (!saveBtn) return;
+
+  // Check if any field has changed from original
+  const hasChanges =
+    titleInput?.value !== titleInput?.dataset.original ||
+    dateInput?.value !== dateInput?.dataset.original ||
+    folderSelect?.value !== folderSelect?.dataset.original ||
+    notesInput?.value !== notesInput?.dataset.original;
+
+  saveBtn.disabled = !hasChanges;
+
+  // Hide the "saved" message when making new changes
+  if (hasChanges && saveStatus) {
+    saveStatus.classList.add('hidden');
+  }
+}
+
+async function savePhotoChanges() {
+  if (!currentPhoto) return;
+
+  const saveBtn = document.getElementById('savePhotoBtn');
+  const saveStatus = document.getElementById('saveStatus');
+  const btnText = saveBtn?.querySelector('.btn-text');
+  const btnLoading = saveBtn?.querySelector('.btn-loading');
+
+  // Get current values
+  const title = document.getElementById('editPhotoTitle')?.value.trim();
+  const assignedDate = document.getElementById('editPhotoDate')?.value || null;
+  const folderId = document.getElementById('editPhotoFolder')?.value || null;
+  const description = document.getElementById('editPhotoNotes')?.value.trim() || null;
+
+  // Show loading state
+  if (saveBtn) saveBtn.disabled = true;
+  if (btnText) btnText.classList.add('hidden');
+  if (btnLoading) btnLoading.classList.remove('hidden');
+
+  try {
+    const response = await Auth.authFetch(`/api/photos/${currentPhoto.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: title || 'Untitled',
+        description,
+        folderId: folderId ? parseInt(folderId) : null,
+        assignedDate,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save changes');
+    }
+
+    const updatedPhoto = await response.json();
+
+    // Update currentPhoto with new values
+    currentPhoto.title = updatedPhoto.title;
+    currentPhoto.description = updatedPhoto.description;
+    currentPhoto.folder_id = updatedPhoto.folder_id;
+    currentPhoto.assigned_date = updatedPhoto.assigned_date;
+
+    // Update the original values for change detection
+    const titleInput = document.getElementById('editPhotoTitle');
+    const dateInput = document.getElementById('editPhotoDate');
+    const folderSelect = document.getElementById('editPhotoFolder');
+    const notesInput = document.getElementById('editPhotoNotes');
+
+    if (titleInput) titleInput.dataset.original = titleInput.value;
+    if (dateInput) dateInput.dataset.original = dateInput.value;
+    if (folderSelect) folderSelect.dataset.original = folderSelect.value;
+    if (notesInput) notesInput.dataset.original = notesInput.value;
+
+    // Update the photo in the photos array
+    const photoIndex = photos.findIndex(p => p.id === currentPhoto.id);
+    if (photoIndex !== -1) {
+      photos[photoIndex] = { ...photos[photoIndex], ...updatedPhoto };
+    }
+
+    // Show success message
+    if (saveStatus) {
+      saveStatus.classList.remove('hidden');
+      // Hide after 3 seconds
+      setTimeout(() => {
+        saveStatus.classList.add('hidden');
+      }, 3000);
+    }
+
+  } catch (error) {
+    console.error('Save error:', error);
+    alert('Failed to save changes. Please try again.');
+  } finally {
+    // Reset button state
+    if (btnText) btnText.classList.remove('hidden');
+    if (btnLoading) btnLoading.classList.add('hidden');
+    checkForChanges(); // Re-check to update button state
+  }
 }

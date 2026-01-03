@@ -6,7 +6,7 @@
   <title>My Library - Photo Restore</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="library.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -133,6 +133,164 @@
         </div>
       </div>
 
+      <!-- Inline Photo Detail View (hidden by default) -->
+      <div id="photoDetailView" class="photo-detail-view hidden">
+        <!-- Back Button -->
+        <button id="backToGridBtn" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Library
+        </button>
+
+        <!-- Photo Detail Content -->
+        <div class="photo-detail-content">
+          <!-- Comparison Section -->
+          <div class="comparison-section">
+            <!-- View Toggle -->
+            <div class="comparison-toggle">
+              <button class="comparison-toggle-btn active" data-view="side-by-side">Side by Side</button>
+              <button class="comparison-toggle-btn" data-view="original">Original Only</button>
+              <button class="comparison-toggle-btn" data-view="enhanced">Enhanced Only</button>
+            </div>
+
+            <!-- Comparison View -->
+            <div id="comparisonView" class="comparison-view">
+              <!-- Original Panel -->
+              <div id="originalPanel" class="comparison-panel">
+                <div class="comparison-header">
+                  <span class="comparison-label">Original</span>
+                  <div class="comparison-actions">
+                    <button class="comparison-action-btn" title="Download Original" data-action="download" data-version="original">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                      </svg>
+                    </button>
+                    <button class="comparison-action-btn" title="Copy Original" data-action="copy" data-version="original">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="comparison-image-container">
+                  <img id="originalImage" src="" alt="Original" class="comparison-image">
+                </div>
+              </div>
+
+              <!-- Enhanced Panel -->
+              <div id="enhancedPanel" class="comparison-panel">
+                <div class="comparison-header">
+                  <span class="comparison-label">Enhanced</span>
+                  <div class="comparison-actions">
+                    <button class="comparison-action-btn" title="Download Enhanced" data-action="download" data-version="enhanced">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                      </svg>
+                    </button>
+                    <button class="comparison-action-btn" title="Copy Enhanced" data-action="copy" data-version="enhanced">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="comparison-image-container">
+                  <img id="enhancedImage" src="" alt="Enhanced" class="comparison-image">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Photo Info Sidebar -->
+          <aside class="photo-info-sidebar">
+            <!-- Editable Title -->
+            <div class="edit-field">
+              <label for="editPhotoTitle" class="edit-label">Title</label>
+              <input type="text" id="editPhotoTitle" class="edit-input" placeholder="Untitled">
+            </div>
+
+            <!-- Read-only Meta -->
+            <div class="photo-meta">
+              <div class="meta-item">
+                <span class="meta-label">Created</span>
+                <span id="photoCreated" class="meta-value"></span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Versions</span>
+                <span id="photoVersionCount" class="meta-value"></span>
+              </div>
+            </div>
+
+            <!-- Editable Photo Date -->
+            <div class="edit-field">
+              <label for="editPhotoDate" class="edit-label">Photo Date</label>
+              <input type="date" id="editPhotoDate" class="edit-input">
+            </div>
+
+            <!-- Editable Folder -->
+            <div class="edit-field">
+              <label for="editPhotoFolder" class="edit-label">Folder</label>
+              <select id="editPhotoFolder" class="edit-input">
+                <option value="">No folder</option>
+              </select>
+            </div>
+
+            <!-- Editable Notes -->
+            <div class="edit-field">
+              <label for="editPhotoNotes" class="edit-label">Notes</label>
+              <textarea id="editPhotoNotes" class="edit-textarea" rows="3" placeholder="Add notes about this photo..."></textarea>
+            </div>
+
+            <!-- Save Button -->
+            <div class="edit-actions">
+              <button id="savePhotoBtn" class="btn btn-primary btn-save" disabled>
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                  <polyline points="17,21 17,13 7,13 7,21"/>
+                  <polyline points="7,3 7,8 15,8"/>
+                </svg>
+                <span class="btn-text">Save Changes</span>
+                <span class="btn-loading hidden">
+                  <svg class="spinner" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>
+                    <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+                  </svg>
+                  Saving...
+                </span>
+              </button>
+              <span id="saveStatus" class="save-status hidden">Changes saved</span>
+            </div>
+
+            <hr class="sidebar-divider">
+
+            <!-- Action Buttons -->
+            <div class="photo-actions-detail">
+              <button id="enhanceAgainBtn" class="btn btn-secondary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                </svg>
+                Enhance Again
+              </button>
+              <button id="favoriteBtn" class="btn btn-secondary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Favorite
+              </button>
+              <button id="deletePhotoBtn" class="btn btn-ghost text-danger">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+                Delete Photo
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
       <!-- Empty State -->
       <div id="emptyState" class="empty-state hidden">
         <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -154,91 +312,6 @@
         <p>Loading...</p>
       </div>
     </main>
-  </div>
-
-  <!-- Photo Detail Modal -->
-  <div id="photoModal" class="modal hidden">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content photo-detail">
-      <button class="modal-close">&times;</button>
-      <div class="photo-detail-grid">
-        <div class="comparison-container">
-          <!-- View Toggle -->
-          <div class="comparison-toggle">
-            <button class="comparison-toggle-btn active" data-view="side-by-side">Side by Side</button>
-            <button class="comparison-toggle-btn" data-view="original">Original Only</button>
-            <button class="comparison-toggle-btn" data-view="enhanced">Enhanced Only</button>
-          </div>
-
-          <!-- Comparison View -->
-          <div id="comparisonView" class="comparison-view">
-            <!-- Original Panel -->
-            <div id="originalPanel" class="comparison-panel">
-              <div class="comparison-header">
-                <span class="comparison-label">Original</span>
-                <div class="comparison-actions">
-                  <button class="comparison-action-btn" title="Download Original" data-action="download" data-version="original">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                    </svg>
-                  </button>
-                  <button class="comparison-action-btn" title="Copy Original" data-action="copy" data-version="original">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2"/>
-                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="comparison-image-container">
-                <img id="originalImage" src="" alt="Original" class="comparison-image">
-              </div>
-            </div>
-
-            <!-- Enhanced Panel -->
-            <div id="enhancedPanel" class="comparison-panel">
-              <div class="comparison-header">
-                <span class="comparison-label">Enhanced</span>
-                <div class="comparison-actions">
-                  <button class="comparison-action-btn" title="Download Enhanced" data-action="download" data-version="enhanced">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                    </svg>
-                  </button>
-                  <button class="comparison-action-btn" title="Copy Enhanced" data-action="copy" data-version="enhanced">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2"/>
-                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="comparison-image-container">
-                <img id="enhancedImage" src="" alt="Enhanced" class="comparison-image">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="photo-info">
-          <h2 id="photoTitle" class="photo-info-title"></h2>
-          <div class="photo-meta">
-            <p><strong>Created:</strong> <span id="photoCreated"></span></p>
-            <p><strong>Versions:</strong> <span id="photoVersionCount"></span></p>
-          </div>
-          <div class="photo-actions-detail">
-            <button id="enhanceAgainBtn" class="btn btn-primary">Enhance Again</button>
-            <button id="favoriteBtn" class="btn btn-secondary">
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-              Favorite
-            </button>
-            <button id="deletePhotoBtn" class="btn btn-ghost text-danger">Delete</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- New Folder Modal -->

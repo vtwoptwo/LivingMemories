@@ -89,26 +89,34 @@ app.use((req, res, next) => {
 app.use(express.static(publicPath));
 app.use(express.json());
 
-// Base restoration prompt
-const BASE_PROMPT = `You are a professional photo restoration expert. Your task is to restore this old or damaged photograph while preserving EVERYTHING about the original.
+// Base restoration prompt - emphasizes preserving faces exactly
+const BASE_PROMPT = `You are a conservative photo restoration specialist. Your ONLY job is to clean up physical damage - nothing else.
 
-RESTORATION TASKS (what to fix):
-- Remove dust, scratches, tears, and physical damage marks
-- Remove stains, spots, and discoloration artifacts
-- Reduce noise and grain while keeping natural film texture
-- Correct faded colors - restore vibrancy without altering the original palette
-- Fix minor exposure issues
-- Improve overall clarity and sharpness gently
+CRITICAL FACE PRESERVATION RULE:
+- FACES MUST REMAIN PIXEL-PERFECT IDENTICAL to the original
+- Do NOT regenerate, reconstruct, enhance, or "improve" any faces
+- Do NOT change facial features, expressions, skin texture, or proportions in any way
+- If a face has damage, clean around it minimally - do NOT try to fix or recreate the face
+- Eyes, nose, mouth, ears, hair must look EXACTLY like the original photo
 
-ABSOLUTE CONSTRAINTS (what must NOT change):
-- DO NOT alter any facial features, expressions, or proportions
-- DO NOT change anyone's apparent age, weight, or body shape
-- DO NOT modify the background, setting, or environment
-- DO NOT change the composition, framing, or cropping
-- DO NOT add any elements that weren't in the original
-- DO NOT remove any people, objects, or elements from the scene
+WHAT YOU MAY FIX (minimal, conservative approach):
+- Remove obvious dust specks, scratches, and tear marks ONLY in non-face areas
+- Reduce heavy grain/noise slightly (but keep the vintage film look)
+- Gently correct severe fading to restore some contrast
+- Remove large stains or spots from backgrounds/clothing
 
-The goal is RESTORATION, not enhancement. Output ONLY the restored image.`;
+WHAT YOU MUST NOT DO:
+- Do NOT touch faces or any facial features
+- Do NOT smooth skin or remove natural textures
+- Do NOT sharpen or enhance details beyond the original
+- Do NOT change colors, just restore faded ones slightly
+- Do NOT add any elements that weren't there
+- Do NOT crop or reframe the image
+- Do NOT make people look younger, thinner, or different in any way
+
+APPROACH: Think of this as CLEANING a photo, not improving it. The result should look like the same old photo, just with less dust and scratches. When in doubt, do less - it's better to leave some damage than to alter the people in the photo.
+
+Output ONLY the restored image with minimal, conservative changes.`;
 
 // ============================
 // Photo Upload & Enhancement
