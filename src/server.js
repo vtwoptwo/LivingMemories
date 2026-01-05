@@ -1,12 +1,12 @@
-import express from 'express';
-import multer from 'multer';
-import rateLimit from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import fs from 'fs';
+import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs';
-import { supabase, authMiddleware } from './supabase.js';
 import * as db from './database.js';
+import { authMiddleware } from './supabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,9 +30,9 @@ if (!GEMINI_API_KEY) {
 // Initialize Gemini with new SDK
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-// Use Gemini 2.5 Flash Image model for image generation/editing
-// Alternative models: 'gemini-3-pro-image-preview', 'gemini-2.0-flash-preview-image-generation'
-const MODEL_ID = 'gemini-2.5-flash-image';
+// Use Nano Banana Pro (Gemini 3 Pro Image) for high-quality image enhancement
+// This model provides 4K output, better detail preservation, and superior restoration
+const MODEL_ID = 'gemini-3-pro-image-preview';
 
 // Configure multer for memory storage (no disk persistence)
 const upload = multer({
@@ -40,7 +40,7 @@ const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (_req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
@@ -89,34 +89,149 @@ app.use((req, res, next) => {
 app.use(express.static(publicPath));
 app.use(express.json());
 
-// Base restoration prompt - emphasizes preserving faces exactly
-const BASE_PROMPT = `You are a conservative photo restoration specialist. Your ONLY job is to clean up physical damage - nothing else.
+// ============================
+// Enhancement Prompt System
+// ============================
 
-CRITICAL FACE PRESERVATION RULE:
-- FACES MUST REMAIN PIXEL-PERFECT IDENTICAL to the original
-- Do NOT regenerate, reconstruct, enhance, or "improve" any faces
-- Do NOT change facial features, expressions, skin texture, or proportions in any way
-- If a face has damage, clean around it minimally - do NOT try to fix or recreate the face
-- Eyes, nose, mouth, ears, hair must look EXACTLY like the original photo
+const PROMPT_BASE = `You are a professional photo restoration expert. Your task is to restore this damaged photograph.
 
-WHAT YOU MAY FIX (minimal, conservative approach):
-- Remove obvious dust specks, scratches, and tear marks ONLY in non-face areas
-- Reduce heavy grain/noise slightly (but keep the vintage film look)
-- Gently correct severe fading to restore some contrast
-- Remove large stains or spots from backgrounds/clothing
+### RESTORATION TASKS (MANDATORY)
+1. COMPLETELY REMOVE all visible damage: scratches, tears, stains, dust spots, water damage, fading, cracks, and discoloration
+2. RECONSTRUCT any missing or damaged areas to look seamless and natural
+3. ENHANCE clarity, sharpness, and detail throughout the entire image
+4. FIX exposure issues, uneven lighting, and poor contrast
+5. CLEAN the image so it looks like a well-preserved photograph
 
-WHAT YOU MUST NOT DO:
-- Do NOT touch faces or any facial features
-- Do NOT smooth skin or remove natural textures
-- Do NOT sharpen or enhance details beyond the original
-- Do NOT change colors, just restore faded ones slightly
-- Do NOT add any elements that weren't there
-- Do NOT crop or reframe the image
-- Do NOT make people look younger, thinner, or different in any way
+### PRESERVATION RULES
+- Keep the same person(s) - do NOT change faces, body shapes, or identities
+- Keep the same pose, composition, and framing
+- Keep clothing and accessories accurate to what's visible
+- Do NOT add people, objects, or elements that weren't in the original`;
 
-APPROACH: Think of this as CLEANING a photo, not improving it. The result should look like the same old photo, just with less dust and scratches. When in doubt, do less - it's better to leave some damage than to alter the people in the photo.
+const PROMPT_COLORIZE = `
 
-Output ONLY the restored image with minimal, conservative changes.`;
+### COLORIZATION (MANDATORY - YOU MUST DO THIS)
+**CRITICAL: Convert this image from black-and-white/sepia to FULL REALISTIC COLOR.**
+
+DO NOT output a sepia, grayscale, or monochrome image. The output MUST be in full color.
+
+Apply these colors:
+- SKIN: Natural human skin tones (pink/peach/tan/brown based on ethnicity)
+- HAIR: Realistic hair colors (black, brown, blonde, red, gray based on age)
+- EYES: Natural eye colors
+- CLOTHING: Period-appropriate fabric colors (blues, browns, grays, whites, etc.)
+- BACKGROUND: Realistic environmental colors
+
+The final image should look like it was originally taken with a color camera.`;
+
+const PROMPT_MODERNIZE = `
+
+### MODERNIZATION (ENABLED)
+Transform this into a modern, professional-quality photograph:
+- Apply contemporary photo editing standards (clean, crisp, well-balanced)
+- Enhance dynamic range for rich blacks and bright whites
+- Improve skin texture to look natural but refined
+- Add subtle professional color grading
+- Make it look like it was taken with a modern high-quality camera
+- Result should look like a professionally retouched modern portrait`;
+
+const PROMPT_DIGITIZE = `
+
+### HIGH-RESOLUTION DIGITIZATION (ENABLED)
+Create a pristine digital version:
+- Maximize clarity and sharpness as if scanned at very high DPI
+- Remove all artifacts from the original print/film
+- Enhance fine details (fabric texture, hair strands, skin pores)
+- Create clean, sharp edges throughout
+- Output should look like a museum-quality digital archive scan`;
+
+const PROMPT_FOOTER = `
+
+### OUTPUT
+Generate the restored image now. Apply ALL the instructions above.`;
+
+function buildEnhancementPrompt(options = {}) {
+  const { colorize, modernize, digitize, additionalInstructions } = options;
+
+  let prompt = PROMPT_BASE;
+
+  if (colorize) {
+    prompt += PROMPT_COLORIZE;
+  }
+
+  if (modernize) {
+    prompt += PROMPT_MODERNIZE;
+  }
+
+  if (digitize) {
+    prompt += PROMPT_DIGITIZE;
+  }
+
+  prompt += PROMPT_FOOTER;
+
+  if (additionalInstructions?.trim()) {
+    prompt += `\n\n### ADDITIONAL USER INSTRUCTIONS\n${additionalInstructions.trim()}`;
+  }
+
+  return prompt;
+}
+
+// ============================
+// Response Extraction Helpers
+// ============================
+
+function extractImageFromResponse(response) {
+  const candidates = response.candidates || [];
+  for (const candidate of candidates) {
+    const parts = candidate.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData?.data) {
+        return part.inlineData.data;
+      }
+    }
+  }
+  if (response.parts) {
+    for (const part of response.parts) {
+      if (part.inlineData?.data) {
+        return part.inlineData.data;
+      }
+    }
+  }
+  return null;
+}
+
+function extractMimeTypeFromResponse(response) {
+  const candidates = response.candidates || [];
+  for (const candidate of candidates) {
+    const parts = candidate.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData?.mimeType) {
+        return part.inlineData.mimeType;
+      }
+    }
+  }
+  if (response.parts) {
+    for (const part of response.parts) {
+      if (part.inlineData?.mimeType) {
+        return part.inlineData.mimeType;
+      }
+    }
+  }
+  return null;
+}
+
+function extractTextFromResponse(response) {
+  const candidates = response.candidates || [];
+  for (const candidate of candidates) {
+    const parts = candidate.content?.parts || [];
+    for (const part of parts) {
+      if (part.text) {
+        return part.text;
+      }
+    }
+  }
+  return '';
+}
 
 // ============================
 // Photo Upload & Enhancement
@@ -189,7 +304,7 @@ app.post('/api/photos', authMiddleware, upload.single('image'), async (req, res)
 app.post('/api/photos/:photoId/enhance', authMiddleware, enhanceLimiter, async (req, res) => {
   const userId = req.user.id;
   const photoId = parseInt(req.params.photoId);
-  const { additionalInstructions, versionId } = req.body;
+  const { additionalInstructions, versionId, colorize, modernize, digitize } = req.body;
 
   let job = null;
 
@@ -236,13 +351,15 @@ app.post('/api/photos/:photoId/enhance', authMiddleware, enhanceLimiter, async (
     const imageBase64 = imageBuffer.toString('base64');
     const mimeType = inputVersion.storage.mime_type;
 
-    // Build prompt
-    let fullPrompt = BASE_PROMPT;
-    if (additionalInstructions?.trim()) {
-      fullPrompt += `\n\nADDITIONAL USER INSTRUCTIONS:\n${additionalInstructions}`;
-    }
+    // Build prompt with enhancement options
+    const fullPrompt = buildEnhancementPrompt({
+      colorize,
+      modernize,
+      digitize,
+      additionalInstructions,
+    });
 
-    console.log(`Processing photo ${photoId} with Gemini...`);
+    console.log(`Processing photo ${photoId} with Gemini (colorize: ${!!colorize}, modernize: ${!!modernize}, digitize: ${!!digitize})...`);
 
     // Call Gemini
     const response = await ai.models.generateContent({
@@ -259,44 +376,12 @@ app.post('/api/photos/:photoId/enhance', authMiddleware, enhanceLimiter, async (
       config: { responseModalities: ['TEXT', 'IMAGE'] },
     });
 
-    // Extract enhanced image
-    let enhancedImageData = null;
-    let enhancedMimeType = 'image/png';
-
-    const candidates = response.candidates || [];
-    for (const candidate of candidates) {
-      const parts = candidate.content?.parts || [];
-      for (const part of parts) {
-        if (part.inlineData) {
-          enhancedImageData = part.inlineData.data;
-          enhancedMimeType = part.inlineData.mimeType || 'image/png';
-          break;
-        }
-      }
-      if (enhancedImageData) break;
-    }
-
-    if (!enhancedImageData && response.parts) {
-      for (const part of response.parts) {
-        if (part.inlineData) {
-          enhancedImageData = part.inlineData.data;
-          enhancedMimeType = part.inlineData.mimeType || 'image/png';
-          break;
-        }
-      }
-    }
+    // Extract enhanced image from response
+    const enhancedImageData = extractImageFromResponse(response);
+    const enhancedMimeType = extractMimeTypeFromResponse(response) || 'image/png';
 
     if (!enhancedImageData) {
-      let errorText = '';
-      for (const candidate of candidates) {
-        const parts = candidate.content?.parts || [];
-        for (const part of parts) {
-          if (part.text) {
-            errorText = part.text;
-            break;
-          }
-        }
-      }
+      const errorText = extractTextFromResponse(response);
       await db.failEnhancementJob(job.id, userId, errorText || 'No image returned');
       return res.status(422).json({
         error: errorText || 'Unable to process image. Please try a different photo.',
@@ -387,17 +472,22 @@ app.post('/api/enhance', authMiddleware, enhanceLimiter, upload.single('image'),
     }
 
     const additionalInstructions = req.body.additionalInstructions?.trim();
+    const colorize = req.body.colorize === 'true' || req.body.colorize === true;
+    const modernize = req.body.modernize === 'true' || req.body.modernize === true;
+    const digitize = req.body.digitize === 'true' || req.body.digitize === true;
 
-    // Build prompt
-    let fullPrompt = BASE_PROMPT;
-    if (additionalInstructions) {
-      fullPrompt += `\n\nADDITIONAL USER INSTRUCTIONS:\n${additionalInstructions}`;
-    }
+    // Build prompt with enhancement options
+    const fullPrompt = buildEnhancementPrompt({
+      colorize,
+      modernize,
+      digitize,
+      additionalInstructions,
+    });
 
     const imageBase64 = req.file.buffer.toString('base64');
     const mimeType = req.file.mimetype;
 
-    console.log('Processing image with Gemini...');
+    console.log(`Processing image with Gemini (colorize: ${colorize}, modernize: ${modernize}, digitize: ${digitize})...`);
 
     // Call Gemini
     const response = await ai.models.generateContent({
@@ -414,44 +504,12 @@ app.post('/api/enhance', authMiddleware, enhanceLimiter, upload.single('image'),
       config: { responseModalities: ['TEXT', 'IMAGE'] },
     });
 
-    // Extract enhanced image
-    let enhancedImageData = null;
-    let enhancedMimeType = 'image/png';
-
-    const candidates = response.candidates || [];
-    for (const candidate of candidates) {
-      const parts = candidate.content?.parts || [];
-      for (const part of parts) {
-        if (part.inlineData) {
-          enhancedImageData = part.inlineData.data;
-          enhancedMimeType = part.inlineData.mimeType || 'image/png';
-          break;
-        }
-      }
-      if (enhancedImageData) break;
-    }
-
-    if (!enhancedImageData && response.parts) {
-      for (const part of response.parts) {
-        if (part.inlineData) {
-          enhancedImageData = part.inlineData.data;
-          enhancedMimeType = part.inlineData.mimeType || 'image/png';
-          break;
-        }
-      }
-    }
+    // Extract enhanced image from response
+    const enhancedImageData = extractImageFromResponse(response);
+    const enhancedMimeType = extractMimeTypeFromResponse(response) || 'image/png';
 
     if (!enhancedImageData) {
-      let errorText = '';
-      for (const candidate of candidates) {
-        const parts = candidate.content?.parts || [];
-        for (const part of parts) {
-          if (part.text) {
-            errorText = part.text;
-            break;
-          }
-        }
-      }
+      const errorText = extractTextFromResponse(response);
       console.error('No image in response. Text:', errorText);
       return res.status(422).json({
         error: errorText || 'Unable to process image. Please try a different photo.'
@@ -883,7 +941,7 @@ app.post('/api/photos/:photoId/comments', authMiddleware, async (req, res) => {
 });
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
@@ -898,7 +956,7 @@ app.get('/api/me', authMiddleware, (req, res) => {
 });
 
 // Error handling middleware
-app.use((error, req, res, next) => {
+app.use((error, _req, res, _next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({ error: 'File too large. Maximum size is 10MB.' });

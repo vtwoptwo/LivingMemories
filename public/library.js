@@ -13,6 +13,13 @@ let originalVersion = null;
 let enhancedVersion = null;
 let currentComparisonView = 'side-by-side';
 
+// Enhancement options state
+let enhancementOptions = {
+  colorize: false,
+  modernize: false,
+  digitize: false,
+};
+
 // Image cache
 const imageCache = new Map();
 
@@ -488,6 +495,14 @@ function openPhotoDetail(photo) {
   // Update favorite button
   updateFavoriteButton(photo.favorite);
 
+  // Update action bar state (Enhance vs Generate Again, show/hide buttons)
+  updateActionBarState();
+
+  // Clear any previous feedback and reset options
+  const feedbackInput = document.getElementById('enhanceFeedback');
+  if (feedbackInput) feedbackInput.value = '';
+  resetEnhancementOptions();
+
   // Hide grid/jobs views and header, show detail view
   photoGrid.classList.add('hidden');
   jobsView.classList.add('hidden');
@@ -614,13 +629,56 @@ function showToast(message) {
   setTimeout(() => toast.remove(), 3000);
 }
 
+function setupEnhancementOptions() {
+  const toggleButtons = document.querySelectorAll('#photoActionBar .option-toggle');
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const option = button.dataset.option;
+      if (option && enhancementOptions.hasOwnProperty(option)) {
+        enhancementOptions[option] = !enhancementOptions[option];
+        button.classList.toggle('active', enhancementOptions[option]);
+      }
+    });
+  });
+}
+
+function resetEnhancementOptions() {
+  enhancementOptions = { colorize: false, modernize: false, digitize: false };
+  document.querySelectorAll('#photoActionBar .option-toggle').forEach(btn => btn.classList.remove('active'));
+}
+
 function setupPhotoDetailButtons() {
-  // Enhance again
-  const enhanceBtn = document.getElementById('enhanceAgainBtn');
-  if (enhanceBtn) {
-    enhanceBtn.onclick = () => {
-      if (!currentPhoto) return;
-      window.location.href = `/?photoId=${currentPhoto.id}`;
+  // Setup enhancement options toggles
+  setupEnhancementOptions();
+
+  // Enhance/Generate Again button
+  const enhanceActionBtn = document.getElementById('enhanceActionBtn');
+  if (enhanceActionBtn) {
+    enhanceActionBtn.onclick = handleEnhanceAction;
+  }
+
+  // Download button
+  const downloadEnhancedBtn = document.getElementById('downloadEnhancedBtn');
+  if (downloadEnhancedBtn) {
+    downloadEnhancedBtn.onclick = () => {
+      if (enhancedVersion?.signedUrl) {
+        downloadVersion(enhancedVersion, 'enhanced');
+      }
+    };
+  }
+
+  // Restore Again button (clear and start fresh)
+  const restoreAgainActionBtn = document.getElementById('restoreAgainActionBtn');
+  if (restoreAgainActionBtn) {
+    restoreAgainActionBtn.onclick = () => {
+      // Clear feedback and hide related UI
+      const feedbackSection = document.getElementById('feedbackSection');
+      const feedbackInput = document.getElementById('enhanceFeedback');
+      if (feedbackSection) feedbackSection.classList.add('hidden');
+      if (feedbackInput) feedbackInput.value = '';
+
+      // Reset button states
+      updateActionBarState();
     };
   }
 
@@ -679,6 +737,105 @@ function updateFavoriteButton(isFavorite) {
     </svg>
     ${isFavorite ? 'Favorited' : 'Favorite'}
   `;
+}
+
+// ============================================
+// ENHANCE ACTION BAR FUNCTIONALITY
+// ============================================
+
+function updateActionBarState() {
+  const enhanceActionBtn = document.getElementById('enhanceActionBtn');
+  const downloadEnhancedBtn = document.getElementById('downloadEnhancedBtn');
+  const restoreAgainActionBtn = document.getElementById('restoreAgainActionBtn');
+  const feedbackSection = document.getElementById('feedbackSection');
+  const btnText = enhanceActionBtn?.querySelector('.btn-text');
+
+  const hasEnhanced = !!enhancedVersion?.signedUrl;
+
+  if (hasEnhanced) {
+    // Photo has been enhanced - show all buttons
+    if (btnText) btnText.textContent = 'Generate Again';
+    downloadEnhancedBtn?.classList.remove('hidden');
+    restoreAgainActionBtn?.classList.remove('hidden');
+    feedbackSection?.classList.remove('hidden');
+  } else {
+    // No enhancement yet - only show enhance button
+    if (btnText) btnText.textContent = 'Enhance';
+    downloadEnhancedBtn?.classList.add('hidden');
+    restoreAgainActionBtn?.classList.add('hidden');
+    feedbackSection?.classList.add('hidden');
+  }
+}
+
+async function handleEnhanceAction() {
+  if (!currentPhoto || !originalVersion?.signedUrl) return;
+
+  const enhanceActionBtn = document.getElementById('enhanceActionBtn');
+  const btnText = enhanceActionBtn?.querySelector('.btn-text');
+  const btnLoading = enhanceActionBtn?.querySelector('.btn-loading');
+  const feedbackInput = document.getElementById('enhanceFeedback');
+
+  // Show loading state
+  if (enhanceActionBtn) enhanceActionBtn.disabled = true;
+  if (btnText) btnText.classList.add('hidden');
+  if (btnLoading) btnLoading.classList.remove('hidden');
+
+  try {
+    // Get feedback if provided
+    const feedback = feedbackInput?.value.trim();
+
+    // Use the existing enhance endpoint for photos in the library
+    const response = await Auth.authFetch(`/api/photos/${currentPhoto.id}/enhance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        additionalInstructions: feedback || '',
+        versionId: originalVersion.id,
+        colorize: enhancementOptions.colorize,
+        modernize: enhancementOptions.modernize,
+        digitize: enhancementOptions.digitize,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to enhance image');
+    }
+
+    if (!data.success || !data.version) {
+      throw new Error(data.error || 'No enhanced version returned');
+    }
+
+    // Update the enhanced image display
+    const enhancedImg = document.getElementById('enhancedImage');
+    if (enhancedImg && data.version.signedUrl) {
+      enhancedImg.src = data.version.signedUrl;
+      enhancedVersion = data.version;
+    }
+
+    // Update the photo's version count in local state
+    if (currentPhoto.versions) {
+      currentPhoto.versions.push(data.version);
+    }
+
+    // Clear feedback after success
+    if (feedbackInput) feedbackInput.value = '';
+
+    // Update action bar state
+    updateActionBarState();
+
+    showToast('Photo enhanced successfully!');
+
+  } catch (error) {
+    console.error('Enhance error:', error);
+    showToast('Enhancement failed: ' + error.message);
+  } finally {
+    // Reset button state
+    if (enhanceActionBtn) enhanceActionBtn.disabled = false;
+    if (btnText) btnText.classList.remove('hidden');
+    if (btnLoading) btnLoading.classList.add('hidden');
+  }
 }
 
 // Modals

@@ -161,11 +161,6 @@
                 <div class="comparison-header">
                   <span class="comparison-label">Original</span>
                   <div class="comparison-actions">
-                    <button class="comparison-action-btn" title="Download Original" data-action="download" data-version="original">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                      </svg>
-                    </button>
                     <button class="comparison-action-btn" title="Copy Original" data-action="copy" data-version="original">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="9" y="9" width="13" height="13" rx="2"/>
@@ -184,11 +179,6 @@
                 <div class="comparison-header">
                   <span class="comparison-label">Enhanced</span>
                   <div class="comparison-actions">
-                    <button class="comparison-action-btn" title="Download Enhanced" data-action="download" data-version="enhanced">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                      </svg>
-                    </button>
                     <button class="comparison-action-btn" title="Copy Enhanced" data-action="copy" data-version="enhanced">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="9" y="9" width="13" height="13" rx="2"/>
@@ -200,6 +190,74 @@
                 <div class="comparison-image-container">
                   <img id="enhancedImage" src="" alt="Enhanced" class="comparison-image">
                 </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons Bar -->
+            <div id="photoActionBar" class="photo-action-bar">
+              <!-- Enhancement Options -->
+              <div class="enhancement-options">
+                <label class="options-label">Enhancement Options</label>
+                <div class="option-toggles">
+                  <button type="button" id="libOptionColorize" class="option-toggle" data-option="colorize">
+                    <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 2a10 10 0 0 1 10 10"/>
+                      <path d="M12 2a10 10 0 0 0-10 10"/>
+                      <circle cx="12" cy="12" r="4"/>
+                    </svg>
+                    <span class="option-label">Colorize</span>
+                  </button>
+                  <button type="button" id="libOptionModernize" class="option-toggle" data-option="modernize">
+                    <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                    <span class="option-label">Modernize</span>
+                  </button>
+                  <button type="button" id="libOptionDigitize" class="option-toggle" data-option="digitize">
+                    <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="3" width="20" height="14" rx="2"/>
+                      <path d="M8 21h8M12 17v4"/>
+                    </svg>
+                    <span class="option-label">Digitize</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Feedback input -->
+              <div id="feedbackSection" class="feedback-section">
+                <label for="enhanceFeedback" class="feedback-label">Additional instructions <span class="optional">(optional)</span></label>
+                <textarea id="enhanceFeedback" class="feedback-input" placeholder="e.g., 'reduce grain more,' 'focus on faces,' 'preserve vintage feel'" rows="2"></textarea>
+              </div>
+
+              <div class="action-buttons-row">
+                <button id="enhanceActionBtn" class="btn btn-primary">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                  </svg>
+                  <span class="btn-text">Enhance</span>
+                  <span class="btn-loading hidden">
+                    <svg class="spinner" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"/>
+                      <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    Enhancing...
+                  </span>
+                </button>
+                <button id="downloadEnhancedBtn" class="btn btn-success hidden">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                  </svg>
+                  Download
+                </button>
+                <button id="restoreAgainActionBtn" class="btn btn-secondary hidden">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                  </svg>
+                  Restore Again
+                </button>
               </div>
             </div>
           </div>
@@ -268,12 +326,6 @@
 
             <!-- Action Buttons -->
             <div class="photo-actions-detail">
-              <button id="enhanceAgainBtn" class="btn btn-secondary">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-                </svg>
-                Enhance Again
-              </button>
               <button id="favoriteBtn" class="btn btn-secondary">
                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>

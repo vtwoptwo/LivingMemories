@@ -1203,6 +1203,83 @@
 }
 
 /* ============================================
+   PHOTO ACTION BAR
+   ============================================ */
+
+.photo-action-bar {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow);
+  margin-top: var(--space-4);
+}
+
+.feedback-section {
+  margin-bottom: var(--space-5);
+}
+
+.feedback-section.hidden {
+  display: none;
+}
+
+.feedback-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-2);
+}
+
+.feedback-input {
+  width: 100%;
+  padding: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-parchment);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  resize: vertical;
+  min-height: 60px;
+}
+
+.feedback-input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(197, 159, 90, 0.15);
+}
+
+.feedback-input::placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.action-buttons-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.action-buttons-row .btn {
+  flex: 1;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.action-buttons-row .btn.hidden {
+  display: none;
+}
+
+.action-buttons-row .btn-primary {
+  flex: 2;
+}
+
+/* ============================================
    RESPONSIVE DESIGN
    ============================================ */
 
@@ -1267,5 +1344,21 @@
 
   .photo-info-sidebar {
     position: static;
+  }
+
+  .photo-action-bar {
+    padding: var(--space-4);
+  }
+
+  .action-buttons-row {
+    flex-direction: column;
+  }
+
+  .action-buttons-row .btn {
+    min-width: 100%;
+  }
+
+  .action-buttons-row .btn-primary {
+    flex: 1;
   }
 }

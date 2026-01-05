@@ -32,6 +32,13 @@ let enhancedMimeType = null;
 let isSavedToLibrary = false;
 let loadingStageInterval = null;
 
+// Enhancement options state
+let enhancementOptions = {
+  colorize: false,
+  modernize: false,
+  digitize: false,
+};
+
 // Loading stage messages
 const loadingStages = [
   'Analyzing photo...',
@@ -52,8 +59,36 @@ function init() {
   setupDragAndDrop();
   setupFileInput();
   setupButtons();
+  setupEnhancementOptions();
   setupSaveToLibrary();
   loadFolders();
+}
+
+// Setup Enhancement Option Toggles
+function setupEnhancementOptions() {
+  const toggleButtons = document.querySelectorAll('.option-toggle');
+
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const option = button.dataset.option;
+      if (option && enhancementOptions.hasOwnProperty(option)) {
+        enhancementOptions[option] = !enhancementOptions[option];
+        button.classList.toggle('active', enhancementOptions[option]);
+      }
+    });
+  });
+}
+
+function resetEnhancementOptions() {
+  enhancementOptions = {
+    colorize: false,
+    modernize: false,
+    digitize: false,
+  };
+
+  document.querySelectorAll('.option-toggle').forEach(button => {
+    button.classList.remove('active');
+  });
 }
 
 // Load folders for the dropdown
@@ -225,6 +260,11 @@ async function handleEnhance() {
     if (instructions) {
       formData.append('additionalInstructions', instructions);
     }
+
+    // Add enhancement options
+    formData.append('colorize', enhancementOptions.colorize);
+    formData.append('modernize', enhancementOptions.modernize);
+    formData.append('digitize', enhancementOptions.digitize);
 
     const response = await Auth.authFetch('/api/enhance', {
       method: 'POST',
@@ -428,6 +468,7 @@ function handleClear() {
   hideError();
   resetEnhanceButton();
   resetSaveForm();
+  resetEnhancementOptions();
 }
 
 // Download

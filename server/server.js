@@ -1,9 +1,9 @@
 // server/server.js
-import express from "express";
-import cors from "cors";
-import multer from "multer";
-import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import multer from "multer";
 
 dotenv.config();
 
@@ -22,17 +22,28 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const MODEL_ID = "gemini-3-pro-image-preview";
 
 // Base prompt: "remove imperfections but keep everything exactly the same"
-const BASE_PROMPT = `
-You are restoring an old photograph.
-Task: remove imperfections (dust, scratches, stains, noise, minor discoloration) while preserving the photo exactly.
-Constraints:
-- Do NOT change composition, framing, perspective, or crop.
-- Do NOT add or remove objects or details.
-- Do NOT alter faces, identity, age, or body shape.
-- Preserve original textures, patterns, and background details.
-- Keep lighting and color faithful; only correct damage/aging artifacts.
-Return only the restored image.
-`.trim();
+const BASE_PROMPT = `Act as a senior digital imaging specialist and high-end portrait retoucher. Your goal is to transform this vintage reference into a modern, high-resolution digital photograph.
+
+### 1. ABSOLUTE PRESERVATION (Identity & Attire)
+- The subjects must remain 100% recognizable. Do NOT alter facial geometry, expressions, or the specific proportions of the two women and child.
+- The clothing (sweaters, lace collars, patterns) must be preserved exactly as they are in the original photo, but rendered with high-frequency digital detail.
+
+### 2. MODERN DIGITALIZATION & QUALITY
+- Render the image as if captured on a modern full-frame digital camera with a 85mm prime lens at f/1.8.
+- Apply professional post-production color grading: convert the sepia/monochrome into a vibrant, natural color palette with realistic skin tones.
+- Implement modern High Dynamic Range (HDR): ensure deep, clean blacks and bright, crisp whites with no digital noise or grain.
+- Add a soft "bokeh" background blur to create contemporary depth and focus on the subjects.
+
+### 3. HYPER-REALISTIC DETAIL RECONSTRUCTION
+- Reconstruct the blurry areas into sharp, digital textures:
+    - **Skin:** Render realistic skin texture with visible pores and natural imperfections (avoid the "plastic" AI look).
+    - **Eyes:** Add realistic "catchlights" (reflections) to the eyes to make them look alive and sharp.
+    - **Hair:** Define sharp, individual strands and soft highlights.
+    - **Fabric:** Enhance the weave and micro-fibers of the clothing to look tactile and high-definition.
+
+### 4. RESTORATION & FINISH
+- Remove every trace of the original physical damage, including the large tears on the edges and all internal creases.
+- Output a flawless, ultra-high-definition 8k digital image that looks like a contemporary studio portrait.`.trim();
 
 app.post("/api/enhance", upload.single("photo"), async (req, res) => {
   try {

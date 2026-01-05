@@ -96,17 +96,51 @@
 
         <!-- Options Section -->
         <div id="optionsSection" class="options-section hidden">
+          <!-- Enhancement Options -->
+          <div class="enhancement-options">
+            <label class="options-label">Enhancement Options</label>
+            <div class="option-toggles">
+              <button type="button" id="optionColorize" class="option-toggle" data-option="colorize">
+                <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 2a10 10 0 0 1 10 10"/>
+                  <path d="M12 2a10 10 0 0 0-10 10"/>
+                  <circle cx="12" cy="12" r="4"/>
+                </svg>
+                <span class="option-label">Colorize</span>
+                <span class="option-desc">Add color to B&W photos</span>
+              </button>
+              <button type="button" id="optionModernize" class="option-toggle" data-option="modernize">
+                <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                <span class="option-label">Modernize</span>
+                <span class="option-desc">Professional modern look</span>
+              </button>
+              <button type="button" id="optionDigitize" class="option-toggle" data-option="digitize">
+                <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2"/>
+                  <path d="M8 21h8M12 17v4"/>
+                </svg>
+                <span class="option-label">Digitize</span>
+                <span class="option-desc">High-quality digital scan</span>
+              </button>
+            </div>
+          </div>
+
           <div class="input-group">
             <label for="additionalInstructions" class="input-label">
-              Restoration instructions <span class="optional">(optional)</span>
+              Additional instructions <span class="optional">(optional)</span>
             </label>
             <textarea
               id="additionalInstructions"
               class="input-textarea"
-              placeholder="e.g., 'slightly reduce grain,' 'restore faded colors gently,' 'focus on face clarity'"
+              placeholder="e.g., 'slightly reduce grain,' 'focus on face clarity,' 'preserve vintage feel'"
               rows="2"
             ></textarea>
-            <p class="input-hint">These will guide the AI restoration process</p>
+            <p class="input-hint">Custom instructions to guide the restoration</p>
           </div>
 
           <div class="action-buttons">

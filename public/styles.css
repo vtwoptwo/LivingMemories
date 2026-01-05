@@ -1048,6 +1048,113 @@ body {
 }
 
 /* ============================================
+   ENHANCEMENT OPTIONS
+   ============================================ */
+
+.enhancement-options {
+  margin-bottom: var(--space-5);
+}
+
+.options-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-3);
+}
+
+.option-toggles {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.option-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-parchment);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition);
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+}
+
+.option-toggle:hover {
+  border-color: var(--color-gold);
+  background: var(--color-cream);
+}
+
+.option-toggle.active {
+  border-color: var(--color-gold);
+  background: linear-gradient(135deg, rgba(197, 159, 90, 0.15) 0%, rgba(197, 159, 90, 0.05) 100%);
+  box-shadow: 0 0 0 3px rgba(197, 159, 90, 0.2);
+}
+
+.option-toggle.active .option-icon {
+  color: var(--color-gold);
+}
+
+.option-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+
+.option-toggle:hover .option-icon {
+  color: var(--color-text);
+}
+
+.option-label {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.option-desc {
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 600px) {
+  .option-toggles {
+    flex-direction: column;
+  }
+
+  .option-toggle {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    padding: var(--space-3);
+  }
+
+  .option-toggle .option-icon {
+    flex-shrink: 0;
+  }
+
+  .option-desc {
+    display: none;
+  }
+}
+
+/* ============================================
    ANIMATIONS
    ============================================ */
 
